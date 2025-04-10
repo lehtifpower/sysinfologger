@@ -20,6 +20,7 @@ foreach ($partition in $partitions) {
     }
 }
 
+$cpuName = (Get-CimInstance CIM_Processor).name
 $totalRAM = (Get-CIMInstance CIM_OperatingSystem).TotalVisibleMemorySize
 $date = Get-Date -Format "dd/MM/yyyy"
 $time = Get-Date -Format "HH:mm:ss"
@@ -40,5 +41,12 @@ $logTab +
 "`n|  OS:           " + $osName +
 "`n|  Version:      " + $osVersion + " Build" + $osBuild +
 "`n" +
-"`n┌  Installed programs:  " + $programs | Out-File -FilePath "logs/$date Sysinfologger.log" -Append
+"`n┌  HARDWARE" +
+"`n|  CPU" + $cpuName
+"`n" +
+"`n" +
+"`n┌  Installed programs:  " + 
+"`n|  $programs" +
+"`n" +
+"`n" | Out-File -FilePath "logs/$date Sysinfologger.log" -Append
 
