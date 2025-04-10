@@ -4,14 +4,14 @@ get-ciminstance CIM_OperatingSystem | format-list Version, BuildNumber, Caption,
 
 Write-Host "Installed programs ↓" -ForegroundColor Magenta
 
-Get-CimInstance CIM_Product | Format-List Name
+Get-CimInstance CIM_Product | Select-Object Caption
 
 $osName = (Get-CimInstance CIM_OperatingSystem).Caption
 $osVersion = (get-ciminstance CIM_OperatingSystem).Version
 $osBuild = (get-ciminstance CIM_OperatingSystem).BuildNumber
 $hostName = (get-ciminstance CIM_OperatingSystem).CSName
-$programs = (Get-CimInstance CIM_Product).Name
-$partitions = Get-CimInstance -Class CIM_LogicalDisk 
+$programs = (Get-CimInstance CIM_Product).Caption
+$partitions = Get-CimInstance -Class CIM_LogicalDisk
 
 foreach ($partition in $partitions) { 
     if ($partition.DeviceID -eq "C:") {
@@ -20,7 +20,7 @@ foreach ($partition in $partitions) {
     }
 }
 
-$totalRAM = Get-CIMInstance CIM_OperatingSystem.TotalVisibleMemorySize
+$totalRAM = (Get-CIMInstance CIM_OperatingSystem).TotalVisibleMemorySize
 $date = Get-Date -Format "dd/MM/yyyy"
 $time = Get-Date -Format "HH:mm:ss"
 
@@ -39,5 +39,6 @@ $logTab +
 "`n|  Hostname:     " + $hostName +
 "`n|  OS:           " + $osName +
 "`n|  Version:      " + $osVersion + " Build" + $osBuild +
-"`n|  Installed programs:  " + $programs | Out-File -FilePath "logs/$date Sysinfologger.log" -Append
+"`n" +
+"`n┌  Installed programs:  " + $programs | Out-File -FilePath "logs/$date Sysinfologger.log" -Append
 
