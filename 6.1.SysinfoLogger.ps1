@@ -11,17 +11,33 @@ $osVersion = (get-ciminstance CIM_OperatingSystem).Version
 $osBuild = (get-ciminstance CIM_OperatingSystem).BuildNumber
 $hostName = (get-ciminstance CIM_OperatingSystem).CSName
 $programs = (Get-CimInstance CIM_Product).Name
-$date = Get-Date -Format "dd/MM/yyyy HH:mm:ss"
+$partitions = Get-CimInstance -Class CIM_LogicalDisk 
 
-$logTab = "╔══════════════════════════════════════════════════════════════════════════════════╗
-║                                  SYSINFO LOGGER                                  ║
-╠══════════════════════════════════════════════════════════════════════════════════╣
-║ Log date : " + $date + "                                                   ║
-╚══════════════════════════════════════════════════════════════════════════════════╝"
+foreach ($partition in $partitions) { 
+    if ($partition.DeviceID -eq "C:") {
+        $usedSpace = $partition.Size - $partition.FreeSpace
+        Write-Host ($usedSpace / 1048576)
+    }
+}
+
+$totalRAM = Get-CIMInstance CIM_OperatingSystem.TotalVisibleMemorySize
+$date = Get-Date -Format "dd/MM/yyyy"
+$time = Get-Date -Format "HH:mm:ss"
 
 
-$logTab + "`n`n┌  OPERATING SYSTEM `n|  Hostname:     " + $hostName +
+
+
+
+$logTab = "╔══════════════════════════════════════════════════════════════════════════════════╗`n" +
+          "║                                  SYSINFO LOGGER                                  ║`n" +
+          "╠══════════════════════════════════════════════════════════════════════════════════╣`n" +
+          "║ Log date : " + $time + "                                                              ║`n" +
+          "╚══════════════════════════════════════════════════════════════════════════════════╝`n"
+
+$logTab + 
+"`n┌  OPERATING SYSTEM " + 
+"`n|  Hostname:     " + $hostName +
 "`n|  OS:           " + $osName +
 "`n|  Version:      " + $osVersion + " Build" + $osBuild +
-"`nInstalled programs:  " + $programs| Out-File -FilePath "AlbertLatif-Sysinfologger.log" -Append
+"`n|  Installed programs:  " + $programs | Out-File -FilePath "logs/$date Sysinfologger.log" -Append
 
