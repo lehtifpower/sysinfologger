@@ -20,7 +20,7 @@ foreach ($partition in $partitions) {
     }
 }
 
-$totalRAM = (Get-CIMInstance CIM_OperatingSystem).TotalVisibleMemorySize
+$totalRAM = Get-CIMInstance CIM_OperatingSystem.TotalVisibleMemorySize
 $date = Get-Date -Format "dd/MM/yyyy"
 $time = Get-Date -Format "HH:mm:ss"
 
