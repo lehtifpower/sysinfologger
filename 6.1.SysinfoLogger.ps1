@@ -19,13 +19,23 @@ $partitions = Get-CimInstance -Class CIM_LogicalDisk
 
 foreach ($partition in $partitions) { 
     if ($partition.DeviceID -eq "C:") {
-        $usedSpace = $partition.Size - $partition.FreeSpace
+        $usedDiskSpace = $partition.Size - $partition.FreeSpace
         # Write-Host ($usedSpace / 1048576)
     }
 }
 
+$disks = Get-CimInstance CIM_StorageVolume
+
+foreach ($disk in $disks) { 
+    if ($disk.Caption -eq "C:") {
+        $freeDiskSpace = $disk.FreeSpace
+    }
+}
+
 $cpuName = (Get-CimInstance CIM_Processor).name
-$totalRAM = (Get-CIMInstance CIM_OperatingSystem).TotalVisibleMemorySize
+$totalRAM = ((Get-CIMInstance CIM_OperatingSystem).TotalVisibleMemorySize / 1MB)
+$freeRAM = ((Get-CIMInstance CIM_OperatingSystem).FreePhysicalMemory / 1MB)
+$usedRAM = $totalRAM - $freeRAM
 $date = Get-Date -Format "dd/MM/yyyy"
 $time = Get-Date -Format "HH:mm:ss"
 
@@ -48,8 +58,8 @@ $logTab +
 "`n" +
 "`n┌  HARDWARE" +
 "`n|  CPU:          " + $cpuName +
-"`n|  RAM:          " + ($totalRAM / 1048576).ToString('0' + '.00') +
-"`n|  DISK          " + ($usedSpace / 1073741824).ToString('0' + '.00') + " / " + ($partition.Size / 1073741824).ToString('0' + '.00') + 
+"`n|  RAM:          " + $usedRAM.ToString('.00') + " GB / " + $totalRAM.ToString('.00') + " GB" +
+"`n|  DISK          " + ($usedDiskSpace / 1GB).ToString('.00') + " GB / " + (($usedDiskSpace + $freeDiskSpace) / 1GB).ToString('.00') + " GB" +
 "`n" +
 "`n┌  Installed programs:  " + 
 "`n|  $programs" +
