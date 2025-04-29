@@ -4,7 +4,7 @@ get-ciminstance CIM_OperatingSystem | format-list Version, BuildNumber, Caption,
 
 $ip=Get-NetIPConfiguration|Where-Object{$_.ipv4defaultgateway -ne $null};
 
-Write-Host "IPv4        : " + $ip.IPv4Address.ipaddress -ForegroundColor Green
+Write-Host "IPv4        : " $ip.IPv4Address.ipaddress -ForegroundColor Green
 
 Write-Host "Installed programs ↓" -ForegroundColor Magenta
 
@@ -14,7 +14,7 @@ $osName = (Get-CimInstance CIM_OperatingSystem).Caption
 $osVersion = (get-ciminstance CIM_OperatingSystem).Version
 $osBuild = (get-ciminstance CIM_OperatingSystem).BuildNumber
 $hostName = (get-ciminstance CIM_OperatingSystem).CSName
-$programs = (Get-CimInstance CIM_Product).Caption
+$programs = (Get-CimInstance CIM_Product).Caption | Format-List
 $partitions = Get-CimInstance -Class CIM_LogicalDisk
 
 foreach ($partition in $partitions) { 
@@ -49,12 +49,12 @@ $logTab = "╔══════════════════════
           "║ Log date : " + $time + "                                                              ║`n" +
           "╚══════════════════════════════════════════════════════════════════════════════════╝`n"
 
-$logTab + 
+$log =  
 "`n┌  OPERATING SYSTEM " + 
 "`n|  Hostname:     " + $hostName +
 "`n|  OS:           " + $osName +
 "`n|  Version:      " + $osVersion + " Build " + $osBuild +
-"`n|  IPv4:         " + $ip +
+"`n|  IPv4:         " + $ip.IPv4Address.ipaddress +
 "`n" +
 "`n┌  HARDWARE" +
 "`n|  CPU:          " + $cpuName +
@@ -62,7 +62,9 @@ $logTab +
 "`n|  DISK          " + ($usedDiskSpace / 1GB).ToString('.00') + " GB / " + (($usedDiskSpace + $freeDiskSpace) / 1GB).ToString('.00') + " GB" +
 "`n" +
 "`n┌  Installed programs:  " + 
-"`n|  $programs" +
-"`n" +
-"`n" | Out-File -FilePath "logs/$date Sysinfologger.log" -Append
+"`n|" + $programs +
+"`n" 
 
+
+$logTab + $log | Out-File -FilePath "logs/$date Sysinfologger.log" -Append
+$log | Write-Host
