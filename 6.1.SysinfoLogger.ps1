@@ -2,6 +2,10 @@ Write-Host "`nOperating System ↓" -ForegroundColor magenta
 
 get-ciminstance CIM_OperatingSystem | format-list Version, BuildNumber, Caption, CSName
 
+$ip=Get-NetIPConfiguration|Where-Object{$_.ipv4defaultgateway -ne $null};
+
+Write-Host "IPv4        : " + $ip.IPv4Address.ipaddress -ForegroundColor Green
+
 Write-Host "Installed programs ↓" -ForegroundColor Magenta
 
 Get-CimInstance CIM_Product | Select-Object Caption
@@ -40,15 +44,11 @@ $logTab +
 "`n|  Hostname:     " + $hostName +
 "`n|  OS:           " + $osName +
 "`n|  Version:      " + $osVersion + " Build " + $osBuild +
+"`n|  IPv4:         " + $ip +
 "`n" +
 "`n┌  HARDWARE" +
-<<<<<<< HEAD
-"`n|  CPU" + $cpuName +
-"`n" +
-=======
 "`n|  CPU:          " + $cpuName +
 "`n|  RAM:          " + $totalRAM +
->>>>>>> a2d0112c1d7ad4637eeee2df82343fe8fd013105
 "`n" +
 "`n┌  Installed programs:  " + 
 "`n|  $programs" +
