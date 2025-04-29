@@ -23,9 +23,9 @@ $usedRAM = ($totalRAM - (Get-CIMInstance CIM_OperatingSystem).FreePhysicalMemory
 $disks = Get-CimInstance CIM_LogicalDisk
 
 foreach ($disk in $disks) { 
-    if ($partition.DeviceID -eq "C:") {
-        $usedDiskSpace = $partition.Size - $partition.FreeSpace
-        $diskSize = $partition.Size
+    if ($disk.DeviceID -eq "C:") {
+        $usedDiskSpace = $disk.Size - $disk.FreeSpace
+        $diskSize = $disk.Size
     }
 }
 
