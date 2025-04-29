@@ -16,7 +16,7 @@ $partitions = Get-CimInstance -Class CIM_LogicalDisk
 foreach ($partition in $partitions) { 
     if ($partition.DeviceID -eq "C:") {
         $usedSpace = $partition.Size - $partition.FreeSpace
-        Write-Host ($usedSpace / 1048576)
+        # Write-Host ($usedSpace / 1048576)
     }
 }
 
@@ -43,7 +43,8 @@ $logTab +
 "`n" +
 "`n┌  HARDWARE" +
 "`n|  CPU:          " + $cpuName +
-"`n|  RAM:          " + $totalRAM +
+"`n|  RAM:          " + ($totalRAM / 1048576).ToString('0' + '.00') +
+"`n|  DISK          " + ($usedSpace / 1073741824).ToString('0' + '.00') + " / " + ($partition.Size / 1073741824).ToString('0' + '.00') + 
 "`n" +
 "`n┌  Installed programs:  " + 
 "`n|  $programs" +
