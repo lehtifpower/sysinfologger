@@ -1,47 +1,33 @@
-Write-Host "`nOperating System ↓" -ForegroundColor magenta
+# Write-Host "`nOperating System ↓" -ForegroundColor magenta
+# 
+# get-ciminstance CIM_OperatingSystem | format-list Version, BuildNumber, Caption, CSName
+# 
+# 
+# Write-Host "IPv4        : " $ip.IPv4Address.ipaddress -ForegroundColor Green
+# 
+# Write-Host "Installed programs ↓" -ForegroundColor Magenta
+# 
+# Get-CimInstance CIM_Product | Select-Object Caption
 
-get-ciminstance CIM_OperatingSystem | format-list Version, BuildNumber, Caption, CSName
-
-$ip=Get-NetIPConfiguration|Where-Object{$_.ipv4defaultgateway -ne $null};
-
-Write-Host "IPv4        : " $ip.IPv4Address.ipaddress -ForegroundColor Green
-
-Write-Host "Installed programs ↓" -ForegroundColor Magenta
-
-Get-CimInstance CIM_Product | Select-Object Caption
-
+$date = Get-Date -Format "dd/MM/yyyy"
+$time = Get-Date -Format "HH:mm:ss"
 $osName = (Get-CimInstance CIM_OperatingSystem).Caption
 $osVersion = (get-ciminstance CIM_OperatingSystem).Version
 $osBuild = (get-ciminstance CIM_OperatingSystem).BuildNumber
 $hostName = (get-ciminstance CIM_OperatingSystem).CSName
 $programs = (Get-CimInstance CIM_Product).Caption | Format-List
-$partitions = Get-CimInstance -Class CIM_LogicalDisk
-
-foreach ($partition in $partitions) { 
-    if ($partition.DeviceID -eq "C:") {
-        $usedDiskSpace = $partition.Size - $partition.FreeSpace
-        # Write-Host ($usedSpace / 1048576)
-    }
-}
-
-$disks = Get-CimInstance CIM_StorageVolume
-
-foreach ($disk in $disks) { 
-    if ($disk.Caption -eq "C:") {
-        $freeDiskSpace = $disk.FreeSpace
-    }
-}
-
+$ip = Get-NetIPConfiguration | Where-Object{$_.ipv4defaultgateway -ne $null};
 $cpuName = (Get-CimInstance CIM_Processor).name
 $totalRAM = ((Get-CIMInstance CIM_OperatingSystem).TotalVisibleMemorySize / 1MB)
-$freeRAM = ((Get-CIMInstance CIM_OperatingSystem).FreePhysicalMemory / 1MB)
-$usedRAM = $totalRAM - $freeRAM
-$date = Get-Date -Format "dd/MM/yyyy"
-$time = Get-Date -Format "HH:mm:ss"
+$usedRAM = ($totalRAM - (Get-CIMInstance CIM_OperatingSystem).FreePhysicalMemory / 1MB)
+$disks = Get-CimInstance CIM_LogicalDisk
 
-
-
-
+foreach ($disk in $disks) { 
+    if ($partition.DeviceID -eq "C:") {
+        $usedDiskSpace = $partition.Size - $partition.FreeSpace
+        $diskSize = $partition.Size
+    }
+}
 
 $logTab = "╔══════════════════════════════════════════════════════════════════════════════════╗`n" +
           "║                                  SYSINFO LOGGER                                  ║`n" +
@@ -50,19 +36,20 @@ $logTab = "╔══════════════════════
           "╚══════════════════════════════════════════════════════════════════════════════════╝`n"
 
 $log =  
-"`n┌  OPERATING SYSTEM " + 
-"`n|  Hostname:     " + $hostName +
-"`n|  OS:           " + $osName +
+"`n┌─ OPERATING SYSTEM " + 
+"`n│  Hostname:     " + $hostName +
+"`n│  OS:           " + $osName +
 "`n|  Version:      " + $osVersion + " Build " + $osBuild +
 "`n|  IPv4:         " + $ip.IPv4Address.ipaddress +
 "`n" +
-"`n┌  HARDWARE" +
+"`n┌─ HARDWARE" +
 "`n|  CPU:          " + $cpuName +
 "`n|  RAM:          " + $usedRAM.ToString('.00') + " GB / " + $totalRAM.ToString('.00') + " GB" +
-"`n|  DISK          " + ($usedDiskSpace / 1GB).ToString('.00') + " GB / " + (($usedDiskSpace + $freeDiskSpace) / 1GB).ToString('.00') + " GB" +
+"`n|  DISK          " + ($usedDiskSpace / 1GB).ToString('.00') + " GB / " + ($diskSize / 1GB).ToString('.00') + " GB" +
 "`n" +
-"`n┌  Installed programs:  " + 
-"`n|" + $programs +
+"`n┌─ Installed programs:  " + 
+"`n|  " + $programs +
+"`n|  " 
 "`n" 
 
 
