@@ -39,10 +39,10 @@ $logTab +
 "`n┌  OPERATING SYSTEM " + 
 "`n|  Hostname:     " + $hostName +
 "`n|  OS:           " + $osName +
-"`n|  Version:      " + $osVersion + " Build" + $osBuild +
+"`n|  Version:      " + $osVersion + " Build " + $osBuild +
 "`n" +
 "`n┌  HARDWARE" +
-"`n|  CPU" + $cpuName
+"`n|  CPU" + $cpuName +
 "`n" +
 "`n" +
 "`n┌  Installed programs:  " + 
