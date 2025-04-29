@@ -42,8 +42,8 @@ $logTab +
 "`n|  Version:      " + $osVersion + " Build" + $osBuild +
 "`n" +
 "`n┌  HARDWARE" +
-"`n|  CPU" + $cpuName
-"`n" +
+"`n|  CPU:          " + $cpuName +
+"`n|  RAM:          " + $totalRAM +
 "`n" +
 "`n┌  Installed programs:  " + 
 "`n|  $programs" +
