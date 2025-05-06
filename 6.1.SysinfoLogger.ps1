@@ -16,13 +16,16 @@ $scriptBlock = {
 }
 
 # Create a remote PowerShell session
-$session = New-PSSession -ComputerName $remoteComputer -Credential (Get-Credential)
 
 # Invoke the script block on the remote computer
-Invoke-Command -Session $session -ScriptBlock $scriptBlock -ArgumentList $remoteUser
 # Close the remote session
 Remove-PSSession -Session $session
 #>
+param (
+    [Parameter(Mandatory = $True)][string]$remoteMachine
+)
+
+$scriptBlock = {
 
 $date = Get-Date -Format "dd/MM/yyyy"
 $time = Get-Date -Format "HH:mm:ss"
@@ -45,7 +48,7 @@ foreach ($disk in $disks) {
 }
 
 foreach ($program in $programs) {
-    $var1 = $var1 + $program + "`n" +
+    $installedPrograms = $installedPrograms + $program + "`n" +
     "|  " 
 }
 
@@ -56,25 +59,31 @@ $logTab = "╔══════════════════════
           "╚══════════════════════════════════════════════════════════════════════════════════╝`n"
 
 $log =  
-"`n┌─ OPERATING SYSTEM " + 
+"`n┌─ OPERATING SYSTEM :" + 
 "`n|  " +
 "`n│  Hostname:     " + $hostName +
 "`n│  OS:           " + $osName +
 "`n|  Version:      " + $osVersion + " Build " + $osBuild +
 "`n|  IPv4:         " + $ip.IPv4Address.ipaddress +
 "`n" +
-"`n┌─ HARDWARE" +
+"`n┌─ HARDWARE :" +
 "`n|  " +
 "`n|  CPU:          " + $cpuName +
 "`n|  RAM:          " + $usedRAM.ToString('.00') + " GB / " + $totalRAM.ToString('.00') + " GB" +
 "`n|  DISK          " + ($usedDiskSpace / 1GB).ToString('.00') + " GB / " + ($diskSize / 1GB).ToString('.00') + " GB" +
 "`n" +
-"`n┌─ Installed programs:  " + 
+"`n┌─ INSTALLED PROGRAMS :" + 
 "`n|  " +
-"`n|  " + $var1 +
-"`n|  " +
+"`n|  " + $installedPrograms +
 "`n" 
 
 
-$logTab + $log | Out-File -FilePath "logs/$date Sysinfologger.log" -Append
+$logTab + $log | Out-File -encoding utf8 -FilePath "Z:/projet/logs/$date Sysinfologger.log" -Append
 $log | Write-Host
+
+}
+
+
+$session = New-PSSession -ComputerName $remoteMachine -Credential (Get-Credential)
+Invoke-Command -Session $session -ScriptBlock $scriptBlock 
+Remove-PSSession -Session $session
