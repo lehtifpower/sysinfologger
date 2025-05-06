@@ -1,13 +1,28 @@
-# Write-Host "`nOperating System ↓" -ForegroundColor magenta
-# 
-# get-ciminstance CIM_OperatingSystem | format-list Version, BuildNumber, Caption, CSName
-# 
-# 
-# Write-Host "IPv4        : " $ip.IPv4Address.ipaddress -ForegroundColor Green
-# 
-# Write-Host "Installed programs ↓" -ForegroundColor Magenta
-# 
-# Get-CimInstance CIM_Product | Select-Object Caption
+<#
+$remoteComputer = "PC2"
+$remoteUser = "$remoteComputer\Albert"
+
+
+# Define the script block to create and run the scheduled task
+$scriptBlock = {
+  param($remoteUser)
+  # Create a scheduled task to launch Microsoft Edge
+  $action = New-ScheduledTaskAction -Execute "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" -Argument "https://www.google.com"
+  Register-ScheduledTask -TaskName "RunEdge" -User $remoteUser -Action $action
+  # Run the scheduled task
+  Start-ScheduledTask -TaskName "RunEdge"
+  # Optionally, remove the task after execution
+  Unregister-ScheduledTask -TaskName "RunEdge" -Confirm:$false
+}
+
+# Create a remote PowerShell session
+$session = New-PSSession -ComputerName $remoteComputer -Credential (Get-Credential)
+
+# Invoke the script block on the remote computer
+Invoke-Command -Session $session -ScriptBlock $scriptBlock -ArgumentList $remoteUser
+# Close the remote session
+Remove-PSSession -Session $session
+#>
 
 $date = Get-Date -Format "dd/MM/yyyy"
 $time = Get-Date -Format "HH:mm:ss"
