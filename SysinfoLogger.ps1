@@ -2,9 +2,9 @@
 .NOTES
     *****************************************************************************
     ETML
-    Nom du script:	CanevasV3-FR.ps1 (le nom du fichier)
-    Auteur:	
-    Date:	jj.mm.aaaa
+    Nom du script : SysinfoLogger.ps1
+    Auteur : 	Albert Braimi, Latif Krasniqi
+    Date :	    04.04.2025
  	*****************************************************************************
     Modifications
  	Date  : -
