@@ -3,7 +3,7 @@
     *****************************************************************************
     ETML
     Nom du script : SysinfoLogger.ps1
-    Auteur : 	Albert Braimi, Latif Krasniqi
+    Auteur : 	Albert Braimi, Latif Krasniqi (chef du groupe)
     Date :	    04.04.2025
  	*****************************************************************************
     Modifications
@@ -12,11 +12,16 @@
  	Raisons: -
  	*****************************************************************************
 .SYNOPSIS
-	Information succincte concernant l'utilité du script, comme un titre
+	Script Permettant de recuperer des informations sur une machine local ou distante
  	
 .DESCRIPTION
-    Description plus détaillée du script, avec les actions et les tests effectuées ainsi que les résultats possibles
-  	
+    en lanceant le script il faut mettre l'adresse de la machine local ou de la machine distante.
+    Ensuite on crée un scriptblock qui va contenir tout le script qui sera lancé dans les machines.¨
+    dans le script on crée 12 variables contenant toute les informations sans modification.
+    Pour tout les disque on va chercher si il y en a un qui est égale à C: et pour ce disque on
+    va chercher la taille utilisée en soustrayant la taille du disque par l'espace libre sur le disque.
+
+
 .PARAMETER Param1
     Description du premier paramètre avec les limites et contraintes
 	
