@@ -1,0 +1,10 @@
+### PowerShell ###
+# Exclude packaged modules
+*.zip
+
+# Exclude folders
+directives
+logs
+
+# Exclude .NET assemblies from source
+*.dll
