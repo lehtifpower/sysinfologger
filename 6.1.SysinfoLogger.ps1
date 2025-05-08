@@ -74,16 +74,6 @@ if(!$remoteMachine)
 
 # Ce que fait le script, ici, afficher un message
     
-
-
-
-
-
-
-
-
-
-
 $scriptBlock = {
 
 $date = Get-Date -Format "dd/MM/yyyy"
