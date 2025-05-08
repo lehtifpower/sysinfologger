@@ -1,26 +1,6 @@
-<#
-$remoteComputer = "PC2"
-$remoteUser = "$remoteComputer\Albert"
 
 
-# Define the script block to create and run the scheduled task
-$scriptBlock = {
-  param($remoteUser)
-  # Create a scheduled task to launch Microsoft Edge
-  $action = New-ScheduledTaskAction -Execute "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" -Argument "https://www.google.com"
-  Register-ScheduledTask -TaskName "RunEdge" -User $remoteUser -Action $action
-  # Run the scheduled task
-  Start-ScheduledTask -TaskName "RunEdge"
-  # Optionally, remove the task after execution
-  Unregister-ScheduledTask -TaskName "RunEdge" -Confirm:$false
-}
 
-# Create a remote PowerShell session
-
-# Invoke the script block on the remote computer
-# Close the remote session
-Remove-PSSession -Session $session
-#>
 param (
     [Parameter(Mandatory = $True)][string]$remoteMachine
 )
