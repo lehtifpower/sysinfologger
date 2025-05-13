@@ -48,29 +48,31 @@
 #>
 # La définition des paramètres se trouve juste après l'en-tête et un commentaire sur le.s paramètre.s est obligatoire 
 param (
-    [Parameter(Mandatory = $True)][string]$remoteMachine
+    [Parameter(Mandatory = $True)][string]$RemoteMachine
 )
 
 ###################################################################################################################
 # Zone de définition des variables et fonctions, avec exemples
 # Commentaires pour les variables
 
-# $varBlock = {
+if $RemoteMachine est là 
+$session = New-CimSession -ComputerName $RemoteMachine -Credential (Get-Credential) 
+else 
+$session = New-CimSession -ComputerName $env:COMPUTERNAME
 
-$session = New-PSSession -ComputerName $remoteMachine -Credential (Get-Credential)      # Session de connection à la machine distante
-$date = Get-Date -Format "dd/MM/yyyy"                                                   # Date
-$time = Get-Date -Format "HH:mm:ss"                                                     # Heure de la journée
-$osName = (Get-CimInstance CIM_OperatingSystem).Caption                                 # Nom du système d'exploitation
-$osVersion = (Get-CimInstance CIM_OperatingSystem).Version                              # Version du système d'exploitation
-$osBuild = (Get-CimInstance CIM_OperatingSystem).BuildNumber                            # Version du build de l'OS
-$hostName = (Get-CimInstance CIM_OperatingSystem).CSName                                # Nom de l'hôte
-$programs = (Get-CimInstance CIM_Product).Name                                          # Liste des programes installés
-$ip = Get-NetIPConfiguration | Where-Object{$_.ipv4defaultgateway -ne $null};           # Adresse IP de la machine
-$cpuName = (Get-CimInstance CIM_Processor).name                                         # Nom du CPU
-$totalRAM = ((Get-CimInstance CIM_OperatingSystem).TotalVisibleMemorySize / 1MB)        # Quantité totale de RAM
-$usedRAM = ($totalRAM - (Get-CimInstance CIM_OperatingSystem).FreePhysicalMemory / 1MB) # Quantitée de RAM utiliée
-$disks = Get-CimInstance CIM_LogicalDisk                                                # Liste de tout les disques
-# }
+
+$date = Get-Date -Format "dd/MM/yyyy"                                                                           # Date
+$time = Get-Date -Format "HH:mm:ss"                                                                             # Heure de la journée
+$osName = (Get-CimInstance -CimSession $session-CimSession $session CIM_OperatingSystem).Caption                # Nom du système d'exploitation
+$osVersion = (Get-CimInstance -CimSession $session CIM_OperatingSystem).Version                                 # Version du système d'exploitation
+$osBuild = (Get-CimInstance -CimSession $session CIM_OperatingSystem).BuildNumber                               # Version du build de l'OS
+$hostName = (Get-CimInstance -CimSession $session CIM_OperatingSystem).CSName                                   # Nom de l'hôte
+$programs = (Get-CimInstance -CimSession $session CIM_Product).Name                                             # Liste des programes installés
+$ip = Get-NetIPConfiguration | Where-Object{$_.ipv4defaultgateway -ne $null};                                   # Adresse IP de la machine
+$cpuName = (Get-CimInstance -CimSession $session CIM_Processor).name                                            # Nom du CPU
+$totalRAM = ((Get-CimInstance -CimSession $session CIM_OperatingSystem).TotalVisibleMemorySize / 1MB)           # Quantité totale de RAM
+$usedRAM = ($totalRAM - (Get-CimInstance -CimSession $session CIM_OperatingSystem).FreePhysicalMemory / 1MB)    # Quantitée de RAM utiliée
+$disks = Get-CimInstance -CimSession $session CIM_LogicalDisk                                                   # Liste de tout les disques
 
 ###################################################################################################################
 # Zone de tests comme les paramètres renseignés ou les droits administrateurs
@@ -94,7 +96,7 @@ Write-Host $disks
 
 
 
-if(!$remoteMachine)
+if(!$RemoteMachine)
 {
     Get-Help $MyInvocation.Mycommand.Path
 	exit
