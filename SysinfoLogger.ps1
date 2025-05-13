@@ -48,27 +48,30 @@
 #>
 # La définition des paramètres se trouve juste après l'en-tête et un commentaire sur le.s paramètre.s est obligatoire 
 param (
-    [Parameter(Mandatory = $True)][string]$RemoteMachine
+    [Parameter(Mandatory = $false)][string]$RemoteMachine
 )
 
 ###################################################################################################################
 # Zone de définition des variables et fonctions, avec exemples
 # Commentaires pour les variables
 
-if $RemoteMachine est là 
-$session = New-CimSession -ComputerName $RemoteMachine -Credential (Get-Credential) 
-else 
-$session = New-CimSession -ComputerName $env:COMPUTERNAME
+if (!([string]::IsNullOrEmpty($RemoteMachine))) {
+    $session = New-CimSession -ComputerName $RemoteMachine -Credential (Get-Credential) 
+}
+
+else {
+    $session = New-CimSession -ComputerName $env:COMPUTERNAME
+}
 
 
 $date = Get-Date -Format "dd/MM/yyyy"                                                                           # Date
 $time = Get-Date -Format "HH:mm:ss"                                                                             # Heure de la journée
-$osName = (Get-CimInstance -CimSession $session-CimSession $session CIM_OperatingSystem).Caption                # Nom du système d'exploitation
+$osName = (Get-CimInstance -CimSession $session CIM_OperatingSystem).Caption                # Nom du système d'exploitation
 $osVersion = (Get-CimInstance -CimSession $session CIM_OperatingSystem).Version                                 # Version du système d'exploitation
 $osBuild = (Get-CimInstance -CimSession $session CIM_OperatingSystem).BuildNumber                               # Version du build de l'OS
 $hostName = (Get-CimInstance -CimSession $session CIM_OperatingSystem).CSName                                   # Nom de l'hôte
 $programs = (Get-CimInstance -CimSession $session CIM_Product).Name                                             # Liste des programes installés
-$ip = Get-NetIPConfiguration | Where-Object{$_.ipv4defaultgateway -ne $null};                                   # Adresse IP de la machine
+$ip = (Get-NetIPConfiguration).IPv4Address                                                  # Adresse IP de la machine
 $cpuName = (Get-CimInstance -CimSession $session CIM_Processor).name                                            # Nom du CPU
 $totalRAM = ((Get-CimInstance -CimSession $session CIM_OperatingSystem).TotalVisibleMemorySize / 1MB)           # Quantité totale de RAM
 $usedRAM = ($totalRAM - (Get-CimInstance -CimSession $session CIM_OperatingSystem).FreePhysicalMemory / 1MB)    # Quantitée de RAM utiliée
@@ -127,7 +130,7 @@ $scriptBlock = {
     }
     
     foreach ($program in $programs) {
-        $installedPrograms = $installedPrograms + $program + "`n" +
+        $installedPrograms += $program + "`n" +
         "|  " 
     }
     
