@@ -57,7 +57,23 @@ param (
 # Zone de définition des variables et fonctions, avec exemples
 # Commentaires pour les variables
 
+$session = New-PSSession -ComputerName $remoteMachine -Credential (Get-Credential)      # Session de connection à la machine distante
 
+# $varBlock = {
+
+$date = Get-Date -Format "dd/MM/yyyy"                                                   # Date
+$time = Get-Date -Format "HH:mm:ss"                                                     # Heure de la journée
+$osName = (Get-CimInstance CIM_OperatingSystem).Caption                                 # Nom du système d'exploitation
+$osVersion = (get-ciminstance CIM_OperatingSystem).Version                              # Version du système d'exploitation
+$osBuild = (get-ciminstance CIM_OperatingSystem).BuildNumber                            # Version du build de l'OS
+$hostName = (get-ciminstance CIM_OperatingSystem).CSName                                # Nom de l'hôte
+$programs = (Get-CimInstance CIM_Product).Name                                          # Liste des programes installés
+$ip = Get-NetIPConfiguration | Where-Object{$_.ipv4defaultgateway -ne $null};           # Adresse IP de la machine
+$cpuName = (Get-CimInstance CIM_Processor).name                                         # Nom du CPU
+$totalRAM = ((Get-CIMInstance CIM_OperatingSystem).TotalVisibleMemorySize / 1MB)        # Quantité totale de RAM
+$usedRAM = ($totalRAM - (Get-CIMInstance CIM_OperatingSystem).FreePhysicalMemory / 1MB) # Quantitée de RAM utiliée
+$disks = Get-CimInstance CIM_LogicalDisk                                                # Liste de tout les disques
+# }
 
 ###################################################################################################################
 # Zone de tests comme les paramètres renseignés ou les droits administrateurs
@@ -74,75 +90,61 @@ if(!$remoteMachine)
 
 # Ce que fait le script, ici, afficher un message
     
-
-
-
-
-
-
-
-
-
-
 $scriptBlock = {
 
-$date = Get-Date -Format "dd/MM/yyyy"
-$time = Get-Date -Format "HH:mm:ss"
-$osName = (Get-CimInstance CIM_OperatingSystem).Caption
-$osVersion = (get-ciminstance CIM_OperatingSystem).Version
-$osBuild = (get-ciminstance CIM_OperatingSystem).BuildNumber
-$hostName = (get-ciminstance CIM_OperatingSystem).CSName
-$programs = (Get-CimInstance CIM_Product).Name
-$ip = Get-NetIPConfiguration | Where-Object{$_.ipv4defaultgateway -ne $null};
-$cpuName = (Get-CimInstance CIM_Processor).name
-$totalRAM = ((Get-CIMInstance CIM_OperatingSystem).TotalVisibleMemorySize / 1MB)
-$usedRAM = ($totalRAM - (Get-CIMInstance CIM_OperatingSystem).FreePhysicalMemory / 1MB)
-$disks = Get-CimInstance CIM_LogicalDisk
-
-foreach ($disk in $disks) { 
-    if ($disk.DeviceID -eq "C:") {
-        $usedDiskSpace = $disk.Size - $disk.FreeSpace
-        $diskSize = $disk.Size
+    foreach ($disk in $disks) { 
+        if ($disk.DeviceID -eq "C:") {
+            $usedDiskSpace = $disk.Size - $disk.FreeSpace
+            $diskSize = $disk.Size
+        }
     }
-}
+    
+    foreach ($program in $programs) {
+        $installedPrograms = $installedPrograms + $program + "`n" +
+        "|  " 
+    }
+    
+    $logTab = "╔══════════════════════════════════════════════════════════════════════════════════╗`n" +
+              "║                                  SYSINFO LOGGER                                  ║`n" +
+              "╠══════════════════════════════════════════════════════════════════════════════════╣`n" +
+              "║ Log date : " + $time + "                                                              ║`n" +
+              "╚══════════════════════════════════════════════════════════════════════════════════╝`n"
+    
+    $log =  
+    "`n┌─ OPERATING SYSTEM :" + 
+    "`n|  " +
+    "`n│  Hostname:     " + $hostName +
+    "`n│  OS:           " + $osName +
+    "`n|  Version:      " + $osVersion + " Build " + $osBuild +
+    "`n|  IPv4:         " + $ip.IPv4Address.ipaddress +
+    "`n" +
+    "`n┌─ HARDWARE :" +
+    "`n|  " +
+    "`n|  CPU:          " + $cpuName +
+    "`n|  RAM:          " + $usedRAM.ToString('.00') + " GB / " + $totalRAM.ToString('.00') + " GB" +
+    "`n|  DISK          " + ($usedDiskSpace / 1GB).ToString('.00') + " GB / " + ($diskSize / 1GB).ToString('.00') + " GB" +
+    "`n" +
+    "`n┌─ INSTALLED PROGRAMS :" + 
+    "`n|  " +
+    "`n|  " + $installedPrograms +
+    "`n" 
+    
+    
+    $logTab + $log | Out-File -encoding utf8 -FilePath "Z:/projet/logs/$date Sysinfologger.log" -Append
+    $log | Write-Host
+    
+    }
+    
+    
+    Invoke-Command -Session $session -ScriptBlock $scriptBlock 
+    Remove-PSSession -Session $session
+    
 
-foreach ($program in $programs) {
-    $installedPrograms = $installedPrograms + $program + "`n" +
-    "|  " 
-}
-
-$logTab = "╔══════════════════════════════════════════════════════════════════════════════════╗`n" +
-          "║                                  SYSINFO LOGGER                                  ║`n" +
-          "╠══════════════════════════════════════════════════════════════════════════════════╣`n" +
-          "║ Log date : " + $time + "                                                              ║`n" +
-          "╚══════════════════════════════════════════════════════════════════════════════════╝`n"
-
-$log =  
-"`n┌─ OPERATING SYSTEM :" + 
-"`n|  " +
-"`n│  Hostname:     " + $hostName +
-"`n│  OS:           " + $osName +
-"`n|  Version:      " + $osVersion + " Build " + $osBuild +
-"`n|  IPv4:         " + $ip.IPv4Address.ipaddress +
-"`n" +
-"`n┌─ HARDWARE :" +
-"`n|  " +
-"`n|  CPU:          " + $cpuName +
-"`n|  RAM:          " + $usedRAM.ToString('.00') + " GB / " + $totalRAM.ToString('.00') + " GB" +
-"`n|  DISK          " + ($usedDiskSpace / 1GB).ToString('.00') + " GB / " + ($diskSize / 1GB).ToString('.00') + " GB" +
-"`n" +
-"`n┌─ INSTALLED PROGRAMS :" + 
-"`n|  " +
-"`n|  " + $installedPrograms +
-"`n" 
 
 
-$logTab + $log | Out-File -encoding utf8 -FilePath "Z:/projet/logs/$date Sysinfologger.log" -Append
-$log | Write-Host
-
-}
 
 
-$session = New-PSSession -ComputerName $remoteMachine -Credential (Get-Credential)
-Invoke-Command -Session $session -ScriptBlock $scriptBlock 
-Remove-PSSession -Session $session
+
+
+
+
