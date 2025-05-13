@@ -3,8 +3,8 @@
     *****************************************************************************
     ETML
     Nom du script : SysinfoLogger.ps1
-    Auteur : 	Albert Braimi, Latif Krasniqi (chef du groupe)
-    Date :	    04.04.2025
+    Auteur : 	Albert Braimi, Latif Krasniqi
+    Date :	    13.05.2025
  	*****************************************************************************
     Modifications
  	Date  : -
@@ -20,24 +20,31 @@
     dans le script on crée 12 variables contenant toute les informations sans modification.
     Pour tout les disque on va chercher si il y en a un qui est le disque C: et pour ce disque on
     va chercher la taille utilisée en soustrayant la taille du disque par l'espace libre sur le disque.
+    pour chaque programmes installé on va les mettres dans une variables avec un retour à la ligne et
+    un trait pour respecter le format des logs.
 
-.PARAMETER Param1
-    Description du premier paramètre avec les limites et contraintes
+.PARAMETER RemoteMachine
+    choix de l'utilisateur si il choisit de recuperer les informations de la machine local ou distante.
 	
 .OUTPUTS
-	Ce qui est produit par le script, comme des fichiers et des modifications du système
+	Création d'un nouveau de fichier de log chaque jour contenant l'heure du log et les informations de la machine.
 	
 .EXAMPLE
-	.\CanevasV3.ps1 -Param1 Toto -Param2 Titi -Param3 Tutu
-	La ligne que l'on tape pour l'exécution du script avec un choix de paramètres
-	Résultat : par exemple un fichier, une modification, un message d'erreur
+	.\Sysinfologger.ps1 IP (local ou distante)
+	
+    Nom de l'hote : ...
+    Credential : ...
+
+    affichage des informations avec le même format que les logs.
 	
 .EXAMPLE
-	.\CanevasV3.ps1
-	Résultat : Sans paramètre, affichage de l'aide
+	.\Sysinfologger.ps1
 	
-.LINK
-    D'autres scripts utilisés dans ce script
+    Adresse IP de l'hote : (Local ou distante)
+    Nom de l'hote : ...
+    Mot de passe de l'hote : ...
+
+	affichage des informations avec le même format que les logs.
 #>
 
 <# Le nombre de paramètres doit correspondre à ceux définis dans l'en-tête
@@ -74,7 +81,7 @@ $programs = (Get-CimInstance -CimSession $session CIM_Product).Name             
 $ip = (Get-NetIPConfiguration).IPv4Address                                                  # Adresse IP de la machine
 $cpuName = (Get-CimInstance -CimSession $session CIM_Processor).name                                            # Nom du CPU
 $totalRAM = ((Get-CimInstance -CimSession $session CIM_OperatingSystem).TotalVisibleMemorySize / 1MB)           # Quantité totale de RAM
-$usedRAM = ($totalRAM - (Get-CimInstance -CimSession $session CIM_OperatingSystem).FreePhysicalMemory / 1MB)    # Quantitée de RAM utiliée
+$usedRAM = ($totalRAM - (Get-CimInstance -CimSession $session CIM_OperatingSystem).FreePhysicalMemory / 1MB)    # Quantitée de RAM utilisée
 $disks = Get-CimInstance -CimSession $session CIM_LogicalDisk                                                   # Liste de tout les disques
 
 ###################################################################################################################
@@ -107,19 +114,7 @@ if(!$RemoteMachine)
 
 ###################################################################################################################
 # Corps du script
-
-# Ce que fait le script, ici, afficher un message
     
-
-
-
-
-
-
-
-
-
-
 $scriptBlock = {
 
     foreach ($disk in $disks) { 
