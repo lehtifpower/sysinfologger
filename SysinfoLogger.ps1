@@ -3,7 +3,7 @@
     *****************************************************************************
     ETML
     Nom du script : SysinfoLogger.ps1
-    Auteur : 	Albert Braimi, Latif Krasniqi
+    Auteur : 	Albert Braimi, Latif Krasniqi (chef du groupe)
     Date :	    04.04.2025
  	*****************************************************************************
     Modifications
@@ -12,20 +12,18 @@
  	Raisons: -
  	*****************************************************************************
 .SYNOPSIS
-	Information succincte concernant l'utilité du script, comme un titre
+	Script Permettant de recuperer des informations sur une machine local ou distante
  	
 .DESCRIPTION
-    Description plus détaillée du script, avec les actions et les tests effectuées ainsi que les résultats possibles
-  	
+    En lançant le script il faut mettre l'adresse de la machine locale ou de la machine distante.
+    Ensuite on crée un scriptblock qui va contenir tout le script qui sera lancé dans les machines.¨
+    dans le script on crée 12 variables contenant toute les informations sans modification.
+    Pour tout les disque on va chercher si il y en a un qui est le disque C: et pour ce disque on
+    va chercher la taille utilisée en soustrayant la taille du disque par l'espace libre sur le disque.
+
 .PARAMETER Param1
     Description du premier paramètre avec les limites et contraintes
 	
-.PARAMETER Param2
-    Description du deuxième paramètre avec les limites et contraintes
- 	
-.PARAMETER Param3
-    Description du troisième paramètre avec les limites et contraintes
-
 .OUTPUTS
 	Ce qui est produit par le script, comme des fichiers et des modifications du système
 	
@@ -57,21 +55,20 @@ param (
 # Zone de définition des variables et fonctions, avec exemples
 # Commentaires pour les variables
 
-$session = New-PSSession -ComputerName $remoteMachine -Credential (Get-Credential)      # Session de connection à la machine distante
-
 # $varBlock = {
 
+$session = New-PSSession -ComputerName $remoteMachine -Credential (Get-Credential)      # Session de connection à la machine distante
 $date = Get-Date -Format "dd/MM/yyyy"                                                   # Date
 $time = Get-Date -Format "HH:mm:ss"                                                     # Heure de la journée
 $osName = (Get-CimInstance CIM_OperatingSystem).Caption                                 # Nom du système d'exploitation
-$osVersion = (get-ciminstance CIM_OperatingSystem).Version                              # Version du système d'exploitation
-$osBuild = (get-ciminstance CIM_OperatingSystem).BuildNumber                            # Version du build de l'OS
-$hostName = (get-ciminstance CIM_OperatingSystem).CSName                                # Nom de l'hôte
+$osVersion = (Get-CimInstance CIM_OperatingSystem).Version                              # Version du système d'exploitation
+$osBuild = (Get-CimInstance CIM_OperatingSystem).BuildNumber                            # Version du build de l'OS
+$hostName = (Get-CimInstance CIM_OperatingSystem).CSName                                # Nom de l'hôte
 $programs = (Get-CimInstance CIM_Product).Name                                          # Liste des programes installés
 $ip = Get-NetIPConfiguration | Where-Object{$_.ipv4defaultgateway -ne $null};           # Adresse IP de la machine
 $cpuName = (Get-CimInstance CIM_Processor).name                                         # Nom du CPU
-$totalRAM = ((Get-CIMInstance CIM_OperatingSystem).TotalVisibleMemorySize / 1MB)        # Quantité totale de RAM
-$usedRAM = ($totalRAM - (Get-CIMInstance CIM_OperatingSystem).FreePhysicalMemory / 1MB) # Quantitée de RAM utiliée
+$totalRAM = ((Get-CimInstance CIM_OperatingSystem).TotalVisibleMemorySize / 1MB)        # Quantité totale de RAM
+$usedRAM = ($totalRAM - (Get-CimInstance CIM_OperatingSystem).FreePhysicalMemory / 1MB) # Quantitée de RAM utiliée
 $disks = Get-CimInstance CIM_LogicalDisk                                                # Liste de tout les disques
 # }
 
@@ -79,6 +76,24 @@ $disks = Get-CimInstance CIM_LogicalDisk                                        
 # Zone de tests comme les paramètres renseignés ou les droits administrateurs
 
 # Affiche l'aide si un ou plusieurs paramètres ne sont par renseignés, "safe guard clauses" permet d'optimiser l'exécution et la lecture des scripts
+
+Write-Host $session
+Write-Host $date
+Write-Host $time
+Write-Host $osName
+Write-Host $osVersion
+Write-Host $osBuild 
+Write-Host $hostName
+Write-Host $programs
+Write-Host $ip
+Write-Host $cpuName 
+Write-Host $totalRAM
+Write-Host $usedRAM
+Write-Host $disks
+
+
+
+
 if(!$remoteMachine)
 {
     Get-Help $MyInvocation.Mycommand.Path
@@ -90,6 +105,16 @@ if(!$remoteMachine)
 
 # Ce que fait le script, ici, afficher un message
     
+
+
+
+
+
+
+
+
+
+
 $scriptBlock = {
 
     foreach ($disk in $disks) { 
@@ -121,7 +146,7 @@ $scriptBlock = {
     "`n┌─ HARDWARE :" +
     "`n|  " +
     "`n|  CPU:          " + $cpuName +
-    "`n|  RAM:          " + $usedRAM.ToString('.00') + " GB / " + $totalRAM.ToString('.00') + " GB" +
+    "`n|  RAM:          " + $usedRAM.('.00') + " GB / " + $totalRAM.('.00') + " GB" +
     "`n|  DISK          " + ($usedDiskSpace / 1GB).ToString('.00') + " GB / " + ($diskSize / 1GB).ToString('.00') + " GB" +
     "`n" +
     "`n┌─ INSTALLED PROGRAMS :" + 
@@ -129,22 +154,16 @@ $scriptBlock = {
     "`n|  " + $installedPrograms +
     "`n" 
     
-    
-    $logTab + $log | Out-File -encoding utf8 -FilePath "Z:/projet/logs/$date Sysinfologger.log" -Append
+
+    New-Item -ItemType Directory -Force -Path ./logs
+
+    $logTab + $log | Out-File -encoding utf8 -FilePath ./logs/$date-sysinfologger.log -Append
     $log | Write-Host
     
-    }
+}
+
     
     
-    Invoke-Command -Session $session -ScriptBlock $scriptBlock 
-    Remove-PSSession -Session $session
-    
-
-
-
-
-
-
-
-
-
+Invoke-Command -Session $session -ScriptBlock $scriptBlock 
+Remove-PSSession -Session $session
+   
