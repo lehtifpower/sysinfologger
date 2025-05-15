@@ -114,7 +114,7 @@ $osVersion = (Get-CimInstance -CimSession $session CIM_OperatingSystem).Version 
 $osBuild = (Get-CimInstance -CimSession $session CIM_OperatingSystem).BuildNumber                               # Version du build de l'OS
 $hostName = (Get-CimInstance -CimSession $session CIM_OperatingSystem).CSName                                   # Nom de l'hôte
 $programs = (Get-CimInstance -CimSession $session CIM_Product).Name                                             # Liste des programes installés
-$ip = (Get-NetIPConfiguration).IPv4Address                                                  # Adresse IP de la machine
+$ip = (Get-CimInstance -CimSession $session Win32_NetworkAdapterConfiguration).IPAddress                        # Adresse IP de la machine
 $cpuName = (Get-CimInstance -CimSession $session CIM_Processor).name                                            # Nom du CPU
 $totalRAM = ((Get-CimInstance -CimSession $session CIM_OperatingSystem).TotalVisibleMemorySize / 1MB)           # Quantité totale de RAM
 $usedRAM = ($totalRAM - (Get-CimInstance -CimSession $session CIM_OperatingSystem).FreePhysicalMemory / 1MB)    # Quantitée de RAM utilisée
@@ -155,7 +155,7 @@ $log =
 "`n│  Hostname:     " + $hostName +
 "`n│  OS:           " + $osName +
 "`n|  Version:      " + $osVersion + " Build " + $osBuild +
-"`n|  IPv4:         " + $ip.IPv4Address.ipaddress +
+"`n|  IPv4:         " + $ip +
 "`n" +
 "`n┌─ HARDWARE :" +
 "`n|  " +
@@ -169,9 +169,7 @@ $log =
 "`n" 
     
 
-New-Item -ItemType Directory -Force -Path ./logs
-
-$logTab + $log | Out-File -encoding utf8 -FilePath ./logs/$date-sysinfologger.log -Append
+$logTab + $log | Out-File -encoding utf8 -Force -FilePath ./logs/$date-sysinfologger.log -Append
 $log | Write-Host
     
 
