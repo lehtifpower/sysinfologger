@@ -103,7 +103,7 @@ if (!([string]::IsNullOrEmpty($RemoteMachine))) {
 }
 
 else {
-    $session = New-CimSession $env:COMPUTERNAME
+    $session = New-CimSession -ComputerName $env:COMPUTERNAME
 }
 
 
@@ -116,7 +116,7 @@ $hostName = (Get-CimInstance -CimSession $session CIM_OperatingSystem).CSName   
 $programs = (Get-CimInstance -CimSession $session CIM_Product).Name                                             # Liste des programes installés
 $ip = (Get-CimInstance -CimSession $session Win32_NetworkAdapterConfiguration).IPAddress                        # Adresse IP de la machine
 $cpuName = (Get-CimInstance -CimSession $session CIM_Processor).name                                            # Nom du CPU
-$totalRAM = ((Get-CimInstance -CimSession $session CIM_OperatingSystem).TotalVisibleMemorySize / 1MB)           # Quantité totale de RAM
+$totalRAM = (Get-CimInstance -CimSession $session CIM_OperatingSystem).TotalVisibleMemorySize / 1MB           # Quantité totale de RAM
 $usedRAM = ($totalRAM - (Get-CimInstance -CimSession $session CIM_OperatingSystem).FreePhysicalMemory / 1MB)    # Quantitée de RAM utilisée
 $disks = Get-CimInstance -CimSession $session CIM_LogicalDisk                                                   # Liste de tout les disques
 
@@ -129,6 +129,7 @@ $disks = Get-CimInstance -CimSession $session CIM_LogicalDisk                   
 ###################################################################################################################
 # Corps du script
     
+
 
 foreach ($disk in $disks) { 
     if ($disk.DeviceID -eq "C:") {
@@ -160,7 +161,7 @@ $log =
 "`n┌─ HARDWARE :" +
 "`n|  " +
 "`n|  CPU:          " + $cpuName +
-"`n|  RAM:          " + $usedRAM.('.00') + " GB / " + $totalRAM.('.00') + " GB" +
+"`n|  RAM:          " + $usedRAM.ToString('.00') + " GB / " + $totalRAM.ToString('.00') + " GB" +
 "`n|  DISK          " + ($usedDiskSpace / 1GB).ToString('.00') + " GB / " + ($diskSize / 1GB).ToString('.00') + " GB" +
 "`n" +
 "`n┌─ INSTALLED PROGRAMS :" + 
