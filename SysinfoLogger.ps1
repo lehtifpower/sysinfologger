@@ -67,7 +67,7 @@ if (!([string]::IsNullOrEmpty($RemoteMachine))) {
 }
 
 else {
-    $session = New-CimSession -ComputerName $env:COMPUTERNAME
+    $session = New-CimSession $env:COMPUTERNAME
 }
 
 
@@ -87,83 +87,58 @@ $disks = Get-CimInstance -CimSession $session CIM_LogicalDisk                   
 ###################################################################################################################
 # Zone de tests comme les paramètres renseignés ou les droits administrateurs
 
-# Affiche l'aide si un ou plusieurs paramètres ne sont par renseignés, "safe guard clauses" permet d'optimiser l'exécution et la lecture des scripts
-
-Write-Host $session
-Write-Host $date
-Write-Host $time
-Write-Host $osName
-Write-Host $osVersion
-Write-Host $osBuild 
-Write-Host $hostName
-Write-Host $programs
-Write-Host $ip
-Write-Host $cpuName 
-Write-Host $totalRAM
-Write-Host $usedRAM
-Write-Host $disks
 
 
-
-
-if(!$RemoteMachine)
-{
-    Get-Help $MyInvocation.Mycommand.Path
-	exit
-}
 
 ###################################################################################################################
 # Corps du script
     
-$scriptBlock = {
 
-    foreach ($disk in $disks) { 
-        if ($disk.DeviceID -eq "C:") {
-            $usedDiskSpace = $disk.Size - $disk.FreeSpace
-            $diskSize = $disk.Size
-        }
+foreach ($disk in $disks) { 
+    if ($disk.DeviceID -eq "C:") {
+        $usedDiskSpace = $disk.Size - $disk.FreeSpace
+        $diskSize = $disk.Size
     }
-    
-    foreach ($program in $programs) {
-        $installedPrograms += $program + "`n" +
-        "|  " 
-    }
-    
-    $logTab = "╔══════════════════════════════════════════════════════════════════════════════════╗`n" +
-              "║                                  SYSINFO LOGGER                                  ║`n" +
-              "╠══════════════════════════════════════════════════════════════════════════════════╣`n" +
-              "║ Log date : " + $time + "                                                              ║`n" +
-              "╚══════════════════════════════════════════════════════════════════════════════════╝`n"
-    
-    $log =  
-    "`n┌─ OPERATING SYSTEM :" + 
-    "`n|  " +
-    "`n│  Hostname:     " + $hostName +
-    "`n│  OS:           " + $osName +
-    "`n|  Version:      " + $osVersion + " Build " + $osBuild +
-    "`n|  IPv4:         " + $ip.IPv4Address.ipaddress +
-    "`n" +
-    "`n┌─ HARDWARE :" +
-    "`n|  " +
-    "`n|  CPU:          " + $cpuName +
-    "`n|  RAM:          " + $usedRAM.('.00') + " GB / " + $totalRAM.('.00') + " GB" +
-    "`n|  DISK          " + ($usedDiskSpace / 1GB).ToString('.00') + " GB / " + ($diskSize / 1GB).ToString('.00') + " GB" +
-    "`n" +
-    "`n┌─ INSTALLED PROGRAMS :" + 
-    "`n|  " +
-    "`n|  " + $installedPrograms +
-    "`n" 
-    
-
-    New-Item -ItemType Directory -Force -Path ./logs
-
-    $logTab + $log | Out-File -encoding utf8 -FilePath ./logs/$date-sysinfologger.log -Append
-    $log | Write-Host
-    
 }
+    
+foreach ($program in $programs) {
+    $installedPrograms += $program + "`n" +
+    "|  " 
+}
+    
+$logTab = 
+"╔══════════════════════════════════════════════════════════════════════════════════╗`n" +
+"║                                  SYSINFO LOGGER                                  ║`n" +
+"╠══════════════════════════════════════════════════════════════════════════════════╣`n" +
+"║ Log date : " + $time + "                                                              ║`n" +
+"╚══════════════════════════════════════════════════════════════════════════════════╝`n"
+    
+$log =  
+"`n┌─ OPERATING SYSTEM :" + 
+"`n|  " +
+"`n│  Hostname:     " + $hostName +
+"`n│  OS:           " + $osName +
+"`n|  Version:      " + $osVersion + " Build " + $osBuild +
+"`n|  IPv4:         " + $ip.IPv4Address.ipaddress +
+"`n" +
+"`n┌─ HARDWARE :" +
+"`n|  " +
+"`n|  CPU:          " + $cpuName +
+"`n|  RAM:          " + $usedRAM.('.00') + " GB / " + $totalRAM.('.00') + " GB" +
+"`n|  DISK          " + ($usedDiskSpace / 1GB).ToString('.00') + " GB / " + ($diskSize / 1GB).ToString('.00') + " GB" +
+"`n" +
+"`n┌─ INSTALLED PROGRAMS :" + 
+"`n|  " +
+"`n|  " + $installedPrograms +
+"`n" 
+    
+
+New-Item -ItemType Directory -Force -Path ./logs
+
+$logTab + $log | Out-File -encoding utf8 -FilePath ./logs/$date-sysinfologger.log -Append
+$log | Write-Host
+    
 
     
     
-Invoke-Command -Session $session -ScriptBlock $scriptBlock 
-Remove-PSSession -Session $session
    
