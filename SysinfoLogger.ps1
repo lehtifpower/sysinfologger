@@ -32,19 +32,55 @@
 .EXAMPLE
 	.\Sysinfologger.ps1 IP (local ou distante)
 	
-    Nom de l'hote : ...
-    Credential : ...
+    Nom de l'hote : ... (ceci ne s'affichera pas si c'est sur la machine local)
+    Credential : ... (ceci ne s'affichera pas si c'est sur la machine local)
 
-    affichage des informations avec le même format que les logs.
+┌─ OPERATING SYSTEM :
+│
+│  Hostname:     PC2
+│  OS:           Microsoft Version d’évaluation de Windows 11 Entreprise
+│  Version:      10.0.22000 Build 22000
+│  IPv4:
+
+┌─ HARDWARE :
+│
+│  CPU:          11th Gen Intel(R) Core(TM) i7-11700 @ 2.50GHz
+│  RAM:           GB /  GB
+│  DISK          23,71 GB / 63,28 GB
+
+┌─ INSTALLED PROGRAMS :
+│
+│  VirtualBox
+│  PowerShell 7-x64
+│  CIM Explorer
+│  Microsoft Update Health Tools
 	
 .EXAMPLE
 	.\Sysinfologger.ps1
-	
-    Adresse IP de l'hote : (Local ou distante)
-    Nom de l'hote : ...
-    Mot de passe de l'hote : ...
 
-	affichage des informations avec le même format que les logs.
+    (comme aucune adresse IP n'est renseignée,
+     le script va s'exécuter sur la machine locale)
+
+┌─ OPERATING SYSTEM :
+│
+│  Hostname:     PC2
+│  OS:           Microsoft Version d’évaluation de Windows 11 Entreprise
+│  Version:      10.0.22000 Build 22000
+│  IPv4:
+
+┌─ HARDWARE :
+│
+│  CPU:          11th Gen Intel(R) Core(TM) i7-11700 @ 2.50GHz
+│  RAM:           GB /  GB
+│  DISK          23,71 GB / 63,28 GB
+
+┌─ INSTALLED PROGRAMS :
+│
+│  VirtualBox
+│  PowerShell 7-x64
+│  CIM Explorer
+│  Microsoft Update Health Tools
+
 #>
 
 <# Le nombre de paramètres doit correspondre à ceux définis dans l'en-tête
