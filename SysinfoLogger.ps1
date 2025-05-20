@@ -12,7 +12,7 @@
  	Raisons: -
  	*****************************************************************************
 .SYNOPSIS
-	Script Permettant de recuperer des informations sur une machine local ou distante
+	Script permettant de récupérer des informations sur une machine locale ou distante
  	
 .DESCRIPTION
     Ce script PowerShell collecte des informations système d’un ordinateur local ou distant (via le paramètre -RemoteMachine) : 
@@ -22,16 +22,16 @@
     ce qui permet de suivre l’évolution des informations chaque jour.
 
 .PARAMETER RemoteMachine
-    choix de l'utilisateur si il choisit de recuperer les informations de la machine local ou distante.
+    Choix de l'utilisateur si il choisit de récupérer les informations de la machine locale ou distante.
 	
 .OUTPUTS
 	Création d'un nouveau de fichier de log chaque jour contenant l'heure du log et les informations de la machine.
 	
 .EXAMPLE
-	.\Sysinfologger.ps1 -RemoteMachine IP (distante ou local)
+	.\Sysinfologger.ps1 -RemoteMachine <Adresse ip (distante ou local)>
 	
-    Nom de l'hote : ...
-    Credential : ...
+    Nom d'utilisateur : ...
+    Mot de passe : ...
 
     ┌─ OPERATING SYSTEM :
     |  
@@ -92,6 +92,7 @@
 #>
 
 # La définition des paramètres se trouve juste après l'en-tête et un commentaire sur le.s paramètre.s est obligatoire 
+
 param (
     [Parameter(Mandatory = $false)][string]$RemoteMachine
 )
