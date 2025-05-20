@@ -56,30 +56,36 @@
 │  Microsoft Update Health Tools
 	
 .EXAMPLE
-	.\Sysinfologger.ps1
+    .\Sysinfologger.ps1
 
-    (comme aucune adresse IP n'est renseignée,
-     le script va s'exécuter sur la machine locale)
+    Comme aucune adresse IP n'est renseignée, le script va s'exécuter sur la machine locale
 
-┌─ OPERATING SYSTEM :
-│
-│  Hostname:     PC2
-│  OS:           Microsoft Version d’évaluation de Windows 11 Entreprise
-│  Version:      10.0.22000 Build 22000
-│  IPv4:
-
-┌─ HARDWARE :
-│
-│  CPU:          11th Gen Intel(R) Core(TM) i7-11700 @ 2.50GHz
-│  RAM:           GB /  GB
-│  DISK          23,71 GB / 63,28 GB
-
-┌─ INSTALLED PROGRAMS :
-│
-│  VirtualBox
-│  PowerShell 7-x64
-│  CIM Explorer
-│  Microsoft Update Health Tools
+    ┌─ OPERATING SYSTEM :
+    |  
+    │  Hostname: 	DESKTOP-DSVUCAI
+    │  OS:       	Microsoft Windows 10 Pro
+    |  Version:  	10.0.19045 Build 19045
+    |  IPv4:     	192.168.1.22
+    |
+    ├─ HARDWARE :
+    |
+    |  CPU: 		AMD Ryzen 7 9800X3D 8-Core Processor           
+    |  RAM: 		13.44 GB / 31.15 GB
+    |  DISK:  	C:	1218.79 GB / 1862.38 GB
+    |  			D:	140.12 GB / 175.71 GB
+    |  			E:	274.43 GB / 14901.98 GB
+    |  			I:	187.28 GB / 465.76 GB
+    |  			
+    ├─ INSTALLED PROGRAMS :
+    |  Blender
+    |  AMD DVR64
+    |  Eclipse Temurin JDK with Hotspot 22.0.2+9 (x64)
+    |  RyzenMasterSDK
+    |  PowerShell 7-x64
+    |  Eclipse Temurin JDK with Hotspot 21.0.6+7 (x64)
+    |  AMD Ryzen Master
+    |  AMD WVR64
+    |  logisim-evolution
 
 #>
 
@@ -163,11 +169,11 @@ $log =
 "`n|  Version:  `t" + $osVersion + " Build " + $osBuild +
 "`n|  IPv4:     `t" + $ip +
 "`n|" +
-"`n├─ HARDWARE :"   +
+"`n├─ HARDWARE :" +
 "`n|" +
-"`n|  CPU: `t`t"    + $cpuName +
-"`n|  RAM: `t`t"    + $usedRAM.ToString('.00') + " GB / " + $totalRAM.ToString('.00') + " GB" +
-"`n|  DISK:  `t"    + $diskOut +
+"`n|  CPU: `t`t" + $cpuName +
+"`n|  RAM: `t`t" + $usedRAM.ToString('.00') + " GB / " + $totalRAM.ToString('.00') + " GB" +
+"`n|  DISK:  `t" + $diskOut +
 
 "`n├─ INSTALLED PROGRAMS :" + 
 "`n|  " + $installedPrograms +
