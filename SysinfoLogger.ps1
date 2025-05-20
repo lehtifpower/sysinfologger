@@ -30,7 +30,7 @@
 	Création d'un nouveau de fichier de log chaque jour contenant l'heure du log et les informations de la machine.
 	
 .EXAMPLE
-	.\Sysinfologger.ps1 IP (distante)
+	.\Sysinfologger.ps1 -RemoteMachine IP (distante ou local)
 	
     Nom de l'hote : ...
     Credential : ...
@@ -83,12 +83,6 @@
 
 #>
 
-<# Le nombre de paramètres doit correspondre à ceux définis dans l'en-tête
-   Il est possible aussi qu'il n'y ait pas de paramètres mais des arguments
-   Un paramètre peut être typé : [string]$Param1
-   Un paramètre peut être initialisé : $Param2="Toto"
-   Un paramètre peut être obligatoire : [Parameter(Mandatory=$True][string]$Param3
-#>
 # La définition des paramètres se trouve juste après l'en-tête et un commentaire sur le.s paramètre.s est obligatoire 
 param (
     [Parameter(Mandatory = $false)][string]$RemoteMachine
