@@ -30,10 +30,10 @@
 	Création d'un nouveau de fichier de log chaque jour contenant l'heure du log et les informations de la machine.
 	
 .EXAMPLE
-	.\Sysinfologger.ps1 IP (local ou distante)
+	.\Sysinfologger.ps1 IP (distante)
 	
-    Nom de l'hote : ... (ceci ne s'affichera pas si c'est sur la machine local)
-    Credential : ... (ceci ne s'affichera pas si c'est sur la machine local)
+    Nom de l'hote : ...
+    Credential : ...
 
 ┌─ OPERATING SYSTEM :
 │
@@ -106,7 +106,6 @@ else {
     $session = New-CimSession -ComputerName $env:COMPUTERNAME
 }
 
-
 $date = Get-Date -Format "dd/MM/yyyy"                                                                           # Date
 $time = Get-Date -Format "HH:mm:ss"                                                                             # Heure de la journée
 $osName = (Get-CimInstance -CimSession $session CIM_OperatingSystem).Caption                # Nom du système d'exploitation
@@ -123,14 +122,9 @@ $disks = Get-CimInstance -CimSession $session CIM_LogicalDisk                   
 ###################################################################################################################
 # Zone de tests comme les paramètres renseignés ou les droits administrateurs
 
-
-
-
 ###################################################################################################################
 # Corps du script
     
-
-
 foreach ($disk in $disks) { 
     if ($disk.DeviceID -eq "C:") {
         $usedDiskSpace = $disk.Size - $disk.FreeSpace
@@ -165,15 +159,8 @@ $log =
 "`n|  DISK          " + ($usedDiskSpace / 1GB).ToString('.00') + " GB / " + ($diskSize / 1GB).ToString('.00') + " GB" +
 "`n" +
 "`n┌─ INSTALLED PROGRAMS :" + 
-"`n|  " +
 "`n|  " + $installedPrograms +
 "`n" 
     
-
 $logTab + $log | Out-File -encoding utf8 -Force -FilePath ./logs/$date-sysinfologger.log -Append
 $log | Write-Host
-    
-
-    
-    
-   
