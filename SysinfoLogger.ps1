@@ -108,14 +108,14 @@ else {
 
 $date = Get-Date -Format "dd/MM/yyyy"                                                                           # Date
 $time = Get-Date -Format "HH:mm:ss"                                                                             # Heure de la journée
-$osName = (Get-CimInstance -CimSession $session CIM_OperatingSystem).Caption                # Nom du système d'exploitation
+$osName = (Get-CimInstance -CimSession $session CIM_OperatingSystem).Caption                                    # Nom du système d'exploitation
 $osVersion = (Get-CimInstance -CimSession $session CIM_OperatingSystem).Version                                 # Version du système d'exploitation
 $osBuild = (Get-CimInstance -CimSession $session CIM_OperatingSystem).BuildNumber                               # Version du build de l'OS
 $hostName = (Get-CimInstance -CimSession $session CIM_OperatingSystem).CSName                                   # Nom de l'hôte
 $programs = (Get-CimInstance -CimSession $session CIM_Product).Name                                             # Liste des programes installés
 $ip = (Get-CimInstance -CimSession $session Win32_NetworkAdapterConfiguration).IPAddress                        # Adresse IP de la machine
 $cpuName = (Get-CimInstance -CimSession $session CIM_Processor).name                                            # Nom du CPU
-$totalRAM = (Get-CimInstance -CimSession $session CIM_OperatingSystem).TotalVisibleMemorySize / 1MB           # Quantité totale de RAM
+$totalRAM = (Get-CimInstance -CimSession $session CIM_OperatingSystem).TotalVisibleMemorySize / 1MB             # Quantité totale de RAM
 $usedRAM = ($totalRAM - (Get-CimInstance -CimSession $session CIM_OperatingSystem).FreePhysicalMemory / 1MB)    # Quantitée de RAM utilisée
 $disks = Get-CimInstance -CimSession $session CIM_LogicalDisk                                                   # Liste de tout les disques
 
@@ -126,11 +126,12 @@ $disks = Get-CimInstance -CimSession $session CIM_LogicalDisk                   
 # Corps du script
     
 foreach ($disk in $disks) { 
-    if ($disk.DeviceID -eq "C:") {
-        $usedDiskSpace = $disk.Size - $disk.FreeSpace
-        $diskSize = $disk.Size
+    if ($disk.DriveType -eq "3") {
+        $diskOut += $disk.DeviceID + "`t" + (($disk.Size - $disk.FreeSpace) / 1GB).ToString('.00') + " GB / " + ($disk.Size / 1GB).ToString('.00') + " GB" + 
+        "`n|  `t`t"
     }
 }
+
     
 foreach ($program in $programs) {
     $installedPrograms += $program + "`n" +
@@ -147,20 +148,20 @@ $logTab =
 $log =  
 "`n┌─ OPERATING SYSTEM :" + 
 "`n|  " +
-"`n│  Hostname:     " + $hostName +
-"`n│  OS:           " + $osName +
-"`n|  Version:      " + $osVersion + " Build " + $osBuild +
-"`n|  IPv4:         " + $ip +
+"`n│  Hostname:`t`t"    + $hostName +
+"`n│  OS:`t`t`t"        + $osName +
+"`n|  Version:`t`t"     + $osVersion + " Build " + $osBuild +
+"`n|  IPv4:`t`t`t"      + $ip +
 "`n" +
 "`n┌─ HARDWARE :" +
 "`n|  " +
-"`n|  CPU:          " + $cpuName +
-"`n|  RAM:          " + $usedRAM.ToString('.00') + " GB / " + $totalRAM.ToString('.00') + " GB" +
-"`n|  DISK          " + ($usedDiskSpace / 1GB).ToString('.00') + " GB / " + ($diskSize / 1GB).ToString('.00') + " GB" +
+"`n|  CPU:`t`t`t"       + $cpuName +
+"`n|  RAM:`t`t`t"       + $usedRAM.ToString('.00') + " GB / " + $totalRAM.ToString('.00') + " GB" +
+"`n|  DISK:`t"          + $diskOut +
 "`n" +
 "`n┌─ INSTALLED PROGRAMS :" + 
 "`n|  " + $installedPrograms +
 "`n" 
     
-$logTab + $log | Out-File -encoding utf8 -Force -FilePath ./logs/$date-sysinfologger.log -Append
+$logTab + $log | Out-File -encoding utf8 -Force -FilePath logs/$date-sysinfologger.log -Append
 $log | Write-Host
