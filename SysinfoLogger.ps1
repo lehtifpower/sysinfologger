@@ -89,32 +89,49 @@ param (
 )
 
 ###################################################################################################################
-# Zone de définition des variables et fonctions, avec exemples
-# Commentaires pour les variables
+# Zone de tests comme les paramètres renseignés ou les droits administrateurs
 
 if (!([string]::IsNullOrEmpty($RemoteMachine))) {
-    $session = New-CimSession -ComputerName $RemoteMachine -Credential (Get-Credential) 
+    if (Test-Connection -ComputerName $RemoteMachine -Count 1 -Quiet) {
+        Write-Host "$RemoteMachine is reachable"
+        try {
+            $session = New-CimSession -ComputerName $RemoteMachine -Credential (Get-Credential) -ErrorAction Stop          
+        }
+        catch {
+            Write-Host "Nom d'utilisateur ou mot de passe incorrect"
+            exit
+        }
+    } 
+    else {
+        Write-Host "$RemoteMachine is not reachable"
+        exit
+    }
 }
-
 else {
     $session = New-CimSession -ComputerName $env:COMPUTERNAME
 }
 
-$date = Get-Date -Format "dd/MM/yyyy"                                                                                       # Date
-$time = Get-Date -Format "HH:mm:ss"                                                                                         # Heure de la journée
-$osName = (Get-CimInstance -CimSession $session CIM_OperatingSystem).Caption                                                # Nom du système d'exploitation
-$osVersion = (Get-CimInstance -CimSession $session CIM_OperatingSystem).Version                                             # Version du système d'exploitation
-$osBuild = (Get-CimInstance -CimSession $session CIM_OperatingSystem).BuildNumber                                           # Version du build de l'OS
-$hostName = (Get-CimInstance -CimSession $session CIM_OperatingSystem).CSName                                               # Nom de l'hôte
-$programs = (Get-CimInstance -CimSession $session CIM_Product).Name                                                         # Liste des programes installés
-$ip = (Get-CimInstance -CimSession $session Win32_NetworkAdapterConfiguration).IPAddress | Where-Object { $_ -like '*.*' }  # Adresse IP de la machine
-$cpuName = (Get-CimInstance -CimSession $session CIM_Processor).name                                                        # Nom du CPU
-$totalRAM = (Get-CimInstance -CimSession $session CIM_OperatingSystem).TotalVisibleMemorySize / 1MB                         # Quantité totale de RAM
-$usedRAM = ($totalRAM - (Get-CimInstance -CimSession $session CIM_OperatingSystem).FreePhysicalMemory / 1MB)                # Quantitée de RAM utilisée
-$disks = Get-CimInstance -CimSession $session CIM_LogicalDisk                                                               # Liste de tout les disques
-
 ###################################################################################################################
-# Zone de tests comme les paramètres renseignés ou les droits administrateurs
+# Zone de définition des variables et fonctions, avec exemples
+
+if (!([string]::IsNullOrEmpty($session))) {
+    $date = Get-Date -Format "dd-MM-yyyy"                                                                                       # Date
+    $time = Get-Date -Format "HH:mm:ss"                                                                                         # Heure
+    $osName = (Get-CimInstance -CimSession $session CIM_OperatingSystem).Caption                                                # Nom du système d'exploitation
+    $osVersion = (Get-CimInstance -CimSession $session CIM_OperatingSystem).Version                                             # Version du système d'exploitation
+    $osBuild = (Get-CimInstance -CimSession $session CIM_OperatingSystem).BuildNumber                                           # Version du build de l'OS
+    $hostName = (Get-CimInstance -CimSession $session CIM_OperatingSystem).CSName                                               # Nom de l'hôte
+    $programs = (Get-CimInstance -CimSession $session CIM_Product).Name                                                         # Liste des programes installés
+    $ip = (Get-CimInstance -CimSession $session Win32_NetworkAdapterConfiguration).IPAddress | Where-Object { $_ -like '*.*' }  # Adresse IP de la machine
+    $cpuName = (Get-CimInstance -CimSession $session CIM_Processor).name                                                        # Nom du CPU
+    $totalRAM = (Get-CimInstance -CimSession $session CIM_OperatingSystem).TotalVisibleMemorySize / 1MB                         # Quantité totale de RAM
+    $usedRAM = $totalRAM - (Get-CimInstance -CimSession $session CIM_OperatingSystem).FreePhysicalMemory / 1MB                  # Quantitée de RAM utilisée
+    $disks = Get-CimInstance -CimSession $session CIM_LogicalDisk                                                               # Liste de tout les disques
+}
+else {
+    Write-Host "Session is null"
+    exit
+}
 
 ###################################################################################################################
 # Corps du script
@@ -122,11 +139,10 @@ $disks = Get-CimInstance -CimSession $session CIM_LogicalDisk                   
 foreach ($disk in $disks) { 
     if ($disk.DriveType -eq "3") {
         $diskOut += $disk.DeviceID + "`t" + (($disk.Size - $disk.FreeSpace) / 1GB).ToString('.00') + " GB / " + ($disk.Size / 1GB).ToString('.00') + " GB" + 
-        "`n|  `t`t"
+        "`n|  `t`t`t"
     }
 }
 
-    
 foreach ($program in $programs) {
     $installedPrograms += $program + "`n" +
     "|  " 
@@ -139,23 +155,23 @@ $logTab =
 "║ Log date : " + $time + "                                                              ║`n" +
 "╚══════════════════════════════════════════════════════════════════════════════════╝`n"
     
-$log =  
+$log = 
 "`n┌─ OPERATING SYSTEM :" + 
 "`n|  " +
-"`n│  Hostname:`t`t"    + $hostName +
-"`n│  OS:`t`t`t"        + $osName +
-"`n|  Version:`t`t"     + $osVersion + " Build " + $osBuild +
-"`n|  IPv4:`t`t"      + $ip +
-"`n" +
-"`n┌─ HARDWARE :" +
-"`n|  " +
-"`n|  CPU:`t`t`t"       + $cpuName +
-"`n|  RAM:`t`t`t"       + $usedRAM.ToString('.00') + " GB / " + $totalRAM.ToString('.00') + " GB" +
-"`n|  DISK:`t"          + $diskOut +
-"`n" +
-"`n┌─ INSTALLED PROGRAMS :" + 
+"`n│  Hostname: `t" + $hostName +
+"`n│  OS:       `t" + $osName +
+"`n|  Version:  `t" + $osVersion + " Build " + $osBuild +
+"`n|  IPv4:     `t" + $ip +
+"`n|" +
+"`n├─ HARDWARE :"   +
+"`n|" +
+"`n|  CPU: `t`t"    + $cpuName +
+"`n|  RAM: `t`t"    + $usedRAM.ToString('.00') + " GB / " + $totalRAM.ToString('.00') + " GB" +
+"`n|  DISK:  `t"    + $diskOut +
+
+"`n├─ INSTALLED PROGRAMS :" + 
 "`n|  " + $installedPrograms +
 "`n" 
     
-$logTab + $log | Out-File -encoding utf8 -Force -FilePath logs/$date-sysinfologger.log -Append
+$logTab + $log | Write-Output >> ./logs/$date-sysinfologger.log
 $log | Write-Host
