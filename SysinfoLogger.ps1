@@ -100,18 +100,18 @@ else {
     $session = New-CimSession -ComputerName $env:COMPUTERNAME
 }
 
-$date = Get-Date -Format "dd/MM/yyyy"                                                                           # Date
-$time = Get-Date -Format "HH:mm:ss"                                                                             # Heure de la journée
-$osName = (Get-CimInstance -CimSession $session CIM_OperatingSystem).Caption                                    # Nom du système d'exploitation
-$osVersion = (Get-CimInstance -CimSession $session CIM_OperatingSystem).Version                                 # Version du système d'exploitation
-$osBuild = (Get-CimInstance -CimSession $session CIM_OperatingSystem).BuildNumber                               # Version du build de l'OS
-$hostName = (Get-CimInstance -CimSession $session CIM_OperatingSystem).CSName                                   # Nom de l'hôte
-$programs = (Get-CimInstance -CimSession $session CIM_Product).Name                                             # Liste des programes installés
-$ip = (Get-CimInstance -CimSession $session Win32_NetworkAdapterConfiguration).IPAddress                        # Adresse IP de la machine
-$cpuName = (Get-CimInstance -CimSession $session CIM_Processor).name                                            # Nom du CPU
-$totalRAM = (Get-CimInstance -CimSession $session CIM_OperatingSystem).TotalVisibleMemorySize / 1MB             # Quantité totale de RAM
-$usedRAM = ($totalRAM - (Get-CimInstance -CimSession $session CIM_OperatingSystem).FreePhysicalMemory / 1MB)    # Quantitée de RAM utilisée
-$disks = Get-CimInstance -CimSession $session CIM_LogicalDisk                                                   # Liste de tout les disques
+$date = Get-Date -Format "dd/MM/yyyy"                                                                                       # Date
+$time = Get-Date -Format "HH:mm:ss"                                                                                         # Heure de la journée
+$osName = (Get-CimInstance -CimSession $session CIM_OperatingSystem).Caption                                                # Nom du système d'exploitation
+$osVersion = (Get-CimInstance -CimSession $session CIM_OperatingSystem).Version                                             # Version du système d'exploitation
+$osBuild = (Get-CimInstance -CimSession $session CIM_OperatingSystem).BuildNumber                                           # Version du build de l'OS
+$hostName = (Get-CimInstance -CimSession $session CIM_OperatingSystem).CSName                                               # Nom de l'hôte
+$programs = (Get-CimInstance -CimSession $session CIM_Product).Name                                                         # Liste des programes installés
+$ip = (Get-CimInstance -CimSession $session Win32_NetworkAdapterConfiguration).IPAddress | Where-Object { $_ -like '*.*' }  # Adresse IP de la machine
+$cpuName = (Get-CimInstance -CimSession $session CIM_Processor).name                                                        # Nom du CPU
+$totalRAM = (Get-CimInstance -CimSession $session CIM_OperatingSystem).TotalVisibleMemorySize / 1MB                         # Quantité totale de RAM
+$usedRAM = ($totalRAM - (Get-CimInstance -CimSession $session CIM_OperatingSystem).FreePhysicalMemory / 1MB)                # Quantitée de RAM utilisée
+$disks = Get-CimInstance -CimSession $session CIM_LogicalDisk                                                               # Liste de tout les disques
 
 ###################################################################################################################
 # Zone de tests comme les paramètres renseignés ou les droits administrateurs
@@ -145,7 +145,7 @@ $log =
 "`n│  Hostname:`t`t"    + $hostName +
 "`n│  OS:`t`t`t"        + $osName +
 "`n|  Version:`t`t"     + $osVersion + " Build " + $osBuild +
-"`n|  IPv4:`t`t`t"      + $ip +
+"`n|  IPv4:`t`t"      + $ip +
 "`n" +
 "`n┌─ HARDWARE :" +
 "`n|  " +
