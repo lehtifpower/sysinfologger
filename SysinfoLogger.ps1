@@ -3,8 +3,8 @@
     *****************************************************************************
     ETML
     Nom du script : SysinfoLogger.ps1
-    Auteur : 	Albert Braimi, Latif Krasniqi
-    Date :	    13.05.2025
+    Auteur : 	    Albert Braimi, Latif Krasniqi
+    Date :	        20.05.2025
  	*****************************************************************************
     Modifications
  	Date  : -
@@ -15,13 +15,11 @@
 	Script Permettant de recuperer des informations sur une machine local ou distante
  	
 .DESCRIPTION
-    En lançant le script il faut mettre l'adresse de la machine locale ou de la machine distante.
-    Ensuite on crée un scriptblock qui va contenir tout le script qui sera lancé dans les machines.¨
-    dans le script on crée 12 variables contenant toute les informations sans modification.
-    Pour tout les disque on va chercher si il y en a un qui est le disque C: et pour ce disque on
-    va chercher la taille utilisée en soustrayant la taille du disque par l'espace libre sur le disque.
-    pour chaque programmes installé on va les mettres dans une variables avec un retour à la ligne et
-    un trait pour respecter le format des logs.
+    Ce script PowerShell collecte des informations système d’un ordinateur local ou distant (via le paramètre -RemoteMachine) : 
+    système d’exploitation, adresse IPv4, processeur, mémoire, disques et programmes installés. 
+    Il utilise une session CIM pour récupérer les données, les formate et les enregistre dans un fichier log structuré,
+    créé dans le dossier ./logs. Un nouveau fichier est généré à chaque exécution avec la date et l’heure,
+    ce qui permet de suivre l’évolution des informations chaque jour.
 
 .PARAMETER RemoteMachine
     choix de l'utilisateur si il choisit de recuperer les informations de la machine local ou distante.
@@ -35,25 +33,29 @@
     Nom de l'hote : ...
     Credential : ...
 
-┌─ OPERATING SYSTEM :
-│
-│  Hostname:     PC2
-│  OS:           Microsoft Version d’évaluation de Windows 11 Entreprise
-│  Version:      10.0.22000 Build 22000
-│  IPv4:
+    ┌─ OPERATING SYSTEM :
+    |  
+    │  Hostname: 	PC2
+    │  OS:       	Microsoft Version d’évaluation de Windows 11 Entreprise
+    |  Version:  	10.0.22000 Build 22000
+    |  IPv4:     	172.20.0.2
+    |
+    ├─ HARDWARE :
+    |
+    |  CPU: 		12th Gen Intel(R) Core(TM) i7-12700F
+    |  RAM: 		2,08 GB / 3,99 GB
+    |  DISK:  	C:	23,71 GB / 63,28 GB
+    |  			S:	,05 GB / 15,00 GB
+    |  			T:	,06 GB / 24,98 GB
+    |  			
+    ├─ INSTALLED PROGRAMS :
+    |  VirtualBox
+    |  PowerShell 7-x64
+    |  CIM Explorer
+    |  Microsoft Update Health Tools
+    |  
 
-┌─ HARDWARE :
-│
-│  CPU:          11th Gen Intel(R) Core(TM) i7-11700 @ 2.50GHz
-│  RAM:           GB /  GB
-│  DISK          23,71 GB / 63,28 GB
 
-┌─ INSTALLED PROGRAMS :
-│
-│  VirtualBox
-│  PowerShell 7-x64
-│  CIM Explorer
-│  Microsoft Update Health Tools
 	
 .EXAMPLE
     .\Sysinfologger.ps1
