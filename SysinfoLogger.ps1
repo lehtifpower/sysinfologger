@@ -34,26 +34,26 @@
     Mot de passe : ...
 
     ┌─ OPERATING SYSTEM :
-    |  
+    │  
     │  Hostname: 	PC2
     │  OS:       	Microsoft Version d’évaluation de Windows 11 Entreprise
-    |  Version:  	10.0.22000 Build 22000
-    |  IPv4:     	172.20.0.2
-    |
+    │  Version:  	10.0.22000 Build 22000
+    │  IPv4:     	172.20.0.2
+    │
     ├─ HARDWARE :
-    |
-    |  CPU: 		12th Gen Intel(R) Core(TM) i7-12700F
-    |  RAM: 		2,08 GB / 3,99 GB
-    |  DISK:  	C:	23,71 GB / 63,28 GB
-    |  			S:	,05 GB / 15,00 GB
-    |  			T:	,06 GB / 24,98 GB
-    |  			
+    │
+    │  CPU: 		12th Gen Intel(R) Core(TM) i7-12700F
+    │  RAM: 		2,08 GB / 3,99 GB
+    │  DISK:  	C:	23,71 GB / 63,28 GB
+    │  			S:	,05 GB / 15,00 GB
+    │  			T:	,06 GB / 24,98 GB
+    │  			
     ├─ INSTALLED PROGRAMS :
-    |  VirtualBox
-    |  PowerShell 7-x64
-    |  CIM Explorer
-    |  Microsoft Update Health Tools
-    |  
+    │  VirtualBox
+    │  PowerShell 7-x64
+    │  CIM Explorer
+    │  Microsoft Update Health Tools
+    │  
 
 
 	
@@ -63,31 +63,31 @@
     Comme aucune adresse IP n'est renseignée, le script va s'exécuter sur la machine locale
 
     ┌─ OPERATING SYSTEM :
-    |  
+    │  
     │  Hostname: 	DESKTOP-DSVUCAI
     │  OS:       	Microsoft Windows 10 Pro
-    |  Version:  	10.0.19045 Build 19045
-    |  IPv4:     	192.168.1.22
-    |
+    │  Version:  	10.0.19045 Build 19045
+    │  IPv4:     	192.168.1.22
+    │
     ├─ HARDWARE :
-    |
-    |  CPU: 		AMD Ryzen 7 9800X3D 8-Core Processor           
-    |  RAM: 		13.44 GB / 31.15 GB
-    |  DISK:  	C:	1218.79 GB / 1862.38 GB
-    |  			D:	140.12 GB / 175.71 GB
-    |  			E:	274.43 GB / 14901.98 GB
-    |  			I:	187.28 GB / 465.76 GB
-    |  			
+    │
+    │  CPU: 		AMD Ryzen 7 9800X3D 8-Core Processor           
+    │  RAM: 		13.44 GB / 31.15 GB
+    │  DISK:  	C:	1218.79 GB / 1862.38 GB
+    │  			D:	140.12 GB / 175.71 GB
+    │  			E:	4274.43 GB / 14901.98 GB
+    │  			I:	187.28 GB / 465.76 GB
+    │  			
     ├─ INSTALLED PROGRAMS :
-    |  Blender
-    |  AMD DVR64
-    |  Eclipse Temurin JDK with Hotspot 22.0.2+9 (x64)
-    |  RyzenMasterSDK
-    |  PowerShell 7-x64
-    |  Eclipse Temurin JDK with Hotspot 21.0.6+7 (x64)
-    |  AMD Ryzen Master
-    |  AMD WVR64
-    |  logisim-evolution
+    │  Blender
+    │  AMD DVR64
+    │  Eclipse Temurin JDK with Hotspot 22.0.2+9 (x64)
+    │  RyzenMasterSDK
+    │  PowerShell 7-x64
+    │  Eclipse Temurin JDK with Hotspot 21.0.6+7 (x64)
+    │  AMD Ryzen Master
+    │  AMD WVR64
+    │  logisim-evolution
 
 #>
 
@@ -157,39 +157,39 @@ else {
 foreach ($disk in $disks) { 
     if ($disk.DriveType -eq "3") {
         $diskOut += $disk.DeviceID + "`t" + (($disk.Size - $disk.FreeSpace) / 1GB).ToString('.00') + " GB / " + ($disk.Size / 1GB).ToString('.00') + " GB" + 
-        "`n|  `t`t`t"
+        "`n│  `t`t`t"
     }
 }
 
 foreach ($program in $programs) {
     $installedPrograms += $program + "`n" +
-    "|  " 
+    "│  " 
 }
     
 $logTab = 
-"╔══════════════════════════════════════════════════════════════════════════════════╗`n" +
-"║                                  SYSINFO LOGGER                                  ║`n" +
-"╠══════════════════════════════════════════════════════════════════════════════════╣`n" +
-"║ Log date : " + $time + "                                                              ║`n" +
-"╚══════════════════════════════════════════════════════════════════════════════════╝`n"
+"┌──────────────────────────────────────────────────────────────────────────────────┐`n" +
+"│                                  SYSINFO LOGGER                                  │`n" +
+"├──────────────────────────────────────────────────────────────────────────────────┤`n" +
+"│ Log date : " + $time + "                                                              │`n" +
+"└──────────────────────────────────────────────────────────────────────────────────┘`n"
     
 $log = 
 "`n┌─ OPERATING SYSTEM :" + 
-"`n|  " +
+"`n│  " +
 "`n│  Hostname: `t" + $hostName +
 "`n│  OS:       `t" + $osName +
-"`n|  Version:  `t" + $osVersion + " Build " + $osBuild +
-"`n|  IPv4:     `t" + $ip +
-"`n|" +
+"`n│  Version:  `t" + $osVersion + " Build " + $osBuild +
+"`n│  IPv4:     `t" + $ip +
+"`n│" +
 "`n├─ HARDWARE :" +
-"`n|" +
-"`n|  CPU: `t`t" + $cpuName +
-"`n|  RAM: `t`t" + $usedRAM.ToString('.00') + " GB / " + $totalRAM.ToString('.00') + " GB" +
-"`n|  DISK:  `t" + $diskOut +
+"`n│" +
+"`n│  CPU: `t`t" + $cpuName +
+"`n│  RAM: `t`t" + $usedRAM.ToString('.00') + " GB / " + $totalRAM.ToString('.00') + " GB" +
+"`n│  DISK:  `t" + $diskOut +
 
 "`n├─ INSTALLED PROGRAMS :" + 
-"`n|" +
-"`n|  " + $installedPrograms +
+"`n│" +
+"`n│  " + $installedPrograms +
 "`n" 
 
 if ($testPath -eq $false) {
