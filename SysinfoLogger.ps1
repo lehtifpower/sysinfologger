@@ -105,21 +105,21 @@ if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
     Exit
 }
 
-if (!([string]::IsNullOrEmpty($RemoteMachine))) {
+if ($RemoteMachine) {
     if (Test-Connection -ComputerName $RemoteMachine -Count 1 -Quiet) {
-        Write-Host "$RemoteMachine is reachable"
+        Write-Host "$RemoteMachine est atteignable" -ForegroundColor Green
         try {
             $session = New-CimSession -ComputerName $RemoteMachine -Credential (Get-Credential) -ErrorAction Stop          
         }
         catch {
-            Write-Host "|  Nom d'utilisateur ou mot de passe incorrect"
-            "|  Le service WinRM n'est peut être pas configuré."
-            "|  Exécutez la commande suivante sur la destination pour analyser et configurer le service WinRM : « winrm quickconfig »."
+            Write-Host "|  Nom d'utilisateur ou mot de passe incorrect" -ForegroundColor Red
+            Write-Host "|  Le service WinRM n'est peut être pas configuré." -ForegroundColor Red
+            Write-Host "|  Exécutez la commande suivante sur la destination pour analyser et configurer le service WinRM : « winrm quickconfig »." -ForegroundColor Red
             exit
         }
     } 
     else {
-        Write-Host "$RemoteMachine is not reachable"
+        Write-Host "$RemoteMachine est inatteignable" -ForegroundColor Red
         exit
     }
 }
@@ -130,7 +130,7 @@ else {
 ###################################################################################################################
 # Zone de définition des variables et fonctions, avec exemples
 
-if (!([string]::IsNullOrEmpty($session))) {
+if ($session) {
     $date = Get-Date -Format "dd-MM-yyyy"                                                                                       # Date
     $time = Get-Date -Format "HH:mm:ss"                                                                                         # Heure
     $osName = (Get-CimInstance -CimSession $session CIM_OperatingSystem).Caption                                                # Nom du système d'exploitation
@@ -143,11 +143,11 @@ if (!([string]::IsNullOrEmpty($session))) {
     $totalRAM = (Get-CimInstance -CimSession $session CIM_OperatingSystem).TotalVisibleMemorySize / 1MB                         # Quantité totale de RAM
     $usedRAM = $totalRAM - (Get-CimInstance -CimSession $session CIM_OperatingSystem).FreePhysicalMemory / 1MB                  # Quantitée de RAM utilisée
     $disks = Get-CimInstance -CimSession $session CIM_LogicalDisk                                                               # Liste de tout les disques
-    $testPath = Test-Path -Path "./logs"                                                                                        # Teste le chemin indiqué
+    $testPath = Test-Path -Path "./logs"                                                                                        # Teste si le fichier log existe
 }
 else {
-    Write-Host "|  Le service WinRM n'est pas configuré."
-    "|  Exécutez la commande suivante sur la destination pour analyser et configurer le service WinRM : « winrm quickconfig »."
+    Write-Host "|  Le service WinRM n'est pas configuré." -ForegroundColor red
+    Write-Host "|  Exécutez la commande suivante sur la destination pour analyser et configurer le service WinRM : « winrm quickconfig »." -ForegroundColor red
     exit
 }
 
@@ -188,11 +188,11 @@ $log =
 "`n|  DISK:  `t" + $diskOut +
 
 "`n├─ INSTALLED PROGRAMS :" + 
+"`n|" +
 "`n|  " + $installedPrograms +
 "`n" 
 
 if ($testPath -eq $false) {
-
     New-Item -Path . -Name "logs" -ItemType "Directory" | Out-Null
     Write-Host "|  Dossier des logs crée." -ForegroundColor Green
 } 
