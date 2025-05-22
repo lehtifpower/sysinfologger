@@ -33,7 +33,7 @@
     Nom d'utilisateur : ...
     Mot de passe : ...
 
-    ┌─ OPERATING SYSTEM :
+    ╭─ OPERATING SYSTEM :
     │  
     │  Hostname: 	PC2
     │  OS:       	Microsoft Version d’évaluation de Windows 11 Entreprise
@@ -52,17 +52,14 @@
     │  VirtualBox
     │  PowerShell 7-x64
     │  CIM Explorer
-    │  Microsoft Update Health Tools
-    │  
-
-
+    ╰─ Microsoft Update Health Tools 
 	
 .EXAMPLE
     .\Sysinfologger.ps1
 
     Comme aucune adresse IP n'est renseignée, le script va s'exécuter sur la machine locale
 
-    ┌─ OPERATING SYSTEM :
+    ╭─ OPERATING SYSTEM :
     │  
     │  Hostname: 	DESKTOP-DSVUCAI
     │  OS:       	Microsoft Windows 10 Pro
@@ -87,14 +84,14 @@
     │  Eclipse Temurin JDK with Hotspot 21.0.6+7 (x64)
     │  AMD Ryzen Master
     │  AMD WVR64
-    │  logisim-evolution
+    ╰─ logisim-evolution
 
 #>
 
 # La définition des paramètres se trouve juste après l'en-tête et un commentaire sur le.s paramètre.s est obligatoire 
 
 param (
-    [Parameter(Mandatory = $false)][string]$RemoteMachine
+    [Parameter(Mandatory = $false)][string]$RemoteMachine   # Ip de la machine distante
 )
 
 ###################################################################################################################
@@ -163,19 +160,11 @@ foreach ($disk in $disks) {
 
 for ($i = 0; $i -lt $programs.Count; $i++) {
     if ($i -eq ($programs.count - 1)) {
-    $installedPrograms += $program + "`n" +
-    "╰─ " 
+        $installedPrograms += "`n" + "╰─ " + $programs[$i] 
     }
     else {
-    $installedPrograms += $program + "`n" +
-    "│  " 
+        $installedPrograms += "`n" + "│  " + $programs[$i] 
     }
-    
-}
-
-foreach ($program in $programs) {
-    $installedPrograms += $program + "`n" +
-    "│  " 
 }
     
 $logTab = 
@@ -200,7 +189,7 @@ $log =
 "`n│  DISK:  `t" + $diskOut +
 
 "`n├─ INSTALLED PROGRAMS :" + 
-"`n│" +
+
 "`n│  " + $installedPrograms +
 "`n" 
 
