@@ -100,6 +100,11 @@ param (
 ###################################################################################################################
 # Zone de tests comme les paramètres renseignés ou les droits administrateurs
 
+if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+  Write-Host "Vous devez exécuter ce script en tant qu'administrateur"
+  Exit
+}
+
 if (!([string]::IsNullOrEmpty($RemoteMachine))) {
     if (Test-Connection -ComputerName $RemoteMachine -Count 1 -Quiet) {
         Write-Host "$RemoteMachine is reachable"
@@ -108,6 +113,8 @@ if (!([string]::IsNullOrEmpty($RemoteMachine))) {
         }
         catch {
             Write-Host "Nom d'utilisateur ou mot de passe incorrect"
+                       "Le service WinRM n'est peut être pas configuré."
+                       "Exécutez la commande suivante sur la destination pour analyser et configurer le service WinRM : « winrm quickconfig »."
             exit
         }
     } 
@@ -117,29 +124,29 @@ if (!([string]::IsNullOrEmpty($RemoteMachine))) {
     }
 }
 else {
-    $session = New-CimSession -ComputerName $env:COMPUTERNAME
+    $session = New-CimSession -ComputerName $env:COMPUTERNAME -ErrorAction SilentlyContinue
 }
 
 ###################################################################################################################
 # Zone de définition des variables et fonctions, avec exemples
 
 if (!([string]::IsNullOrEmpty($session))) {
-    $date = Get-Date -Format "dd-MM-yyyy"                                                                                       # Date
-    $time = Get-Date -Format "HH:mm:ss"                                                                                         # Heure
-    $osName = (Get-CimInstance -CimSession $session CIM_OperatingSystem).Caption                                                # Nom du système d'exploitation
-    $osVersion = (Get-CimInstance -CimSession $session CIM_OperatingSystem).Version                                             # Version du système d'exploitation
-    $osBuild = (Get-CimInstance -CimSession $session CIM_OperatingSystem).BuildNumber                                           # Version du build de l'OS
-    $hostName = (Get-CimInstance -CimSession $session CIM_OperatingSystem).CSName                                               # Nom de l'hôte
-    $programs = (Get-CimInstance -CimSession $session CIM_Product).Name                                                         # Liste des programes installés
-    $ip = (Get-CimInstance -CimSession $session Win32_NetworkAdapterConfiguration).IPAddress | Where-Object { $_ -like '*.*' }  # Adresse IP de la machine
-    $cpuName = (Get-CimInstance -CimSession $session CIM_Processor).name                                                        # Nom du CPU
-    $totalRAM = (Get-CimInstance -CimSession $session CIM_OperatingSystem).TotalVisibleMemorySize / 1MB                         # Quantité totale de RAM
-    $usedRAM = $totalRAM - (Get-CimInstance -CimSession $session CIM_OperatingSystem).FreePhysicalMemory / 1MB                  # Quantitée de RAM utilisée
-    $disks = Get-CimInstance -CimSession $session CIM_LogicalDisk                                                               # Liste de tout les disques
-    $testPath = Test-Path -Path "./logs"
+        $date = Get-Date -Format "dd-MM-yyyy"                                                                                       # Date
+        $time = Get-Date -Format "HH:mm:ss"                                                                                         # Heure
+        $osName = (Get-CimInstance -CimSession $session CIM_OperatingSystem).Caption                                                # Nom du système d'exploitation
+        $osVersion = (Get-CimInstance -CimSession $session CIM_OperatingSystem).Version                                             # Version du système d'exploitation
+        $osBuild = (Get-CimInstance -CimSession $session CIM_OperatingSystem).BuildNumber                                           # Version du build de l'OS
+        $hostName = (Get-CimInstance -CimSession $session CIM_OperatingSystem).CSName                                               # Nom de l'hôte
+        $programs = (Get-CimInstance -CimSession $session CIM_Product).Name                                                         # Liste des programes installés
+        $ip = (Get-CimInstance -CimSession $session Win32_NetworkAdapterConfiguration).IPAddress | Where-Object { $_ -like '*.*' }  # Adresse IP de la machine
+        $cpuName = (Get-CimInstance -CimSession $session CIM_Processor).name                                                        # Nom du CPU
+        $totalRAM = (Get-CimInstance -CimSession $session CIM_OperatingSystem).TotalVisibleMemorySize / 1MB                         # Quantité totale de RAM
+        $usedRAM = $totalRAM - (Get-CimInstance -CimSession $session CIM_OperatingSystem).FreePhysicalMemory / 1MB                  # Quantitée de RAM utilisée
+        $disks = Get-CimInstance -CimSession $session CIM_LogicalDisk                                                               # Liste de tout les disques
 }
 else {
-    Write-Host "Session is null"
+    Write-Host "Le service WinRM n'est pas configuré."
+               "Exécutez la commande suivante sur la destination pour analyser et configurer le service WinRM : « winrm quickconfig »."
     exit
 }
 
@@ -182,11 +189,6 @@ $log =
 "`n├─ INSTALLED PROGRAMS :" + 
 "`n|  " + $installedPrograms +
 "`n" 
-
-if ($testPath -eq $false){
-    New-Item -Path . -Name "logs" -ItemType "Directory"
-    Write-Host "Dossier des logs crée."
-} 
-
+    
 $logTab + $log | Write-Output >> ./logs/$date-sysinfologger.log
 $log | Write-Host
