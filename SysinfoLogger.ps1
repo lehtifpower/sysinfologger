@@ -101,8 +101,8 @@ param (
 # Zone de tests comme les paramètres renseignés ou les droits administrateurs
 
 if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-  Write-Host "Vous devez exécuter ce script en tant qu'administrateur"
-  Exit
+    Write-Host "Vous devez exécuter ce script en tant qu'administrateur"
+    Exit
 }
 
 if (!([string]::IsNullOrEmpty($RemoteMachine))) {
@@ -112,9 +112,9 @@ if (!([string]::IsNullOrEmpty($RemoteMachine))) {
             $session = New-CimSession -ComputerName $RemoteMachine -Credential (Get-Credential) -ErrorAction Stop          
         }
         catch {
-            Write-Host "Nom d'utilisateur ou mot de passe incorrect"
-                       "Le service WinRM n'est peut être pas configuré."
-                       "Exécutez la commande suivante sur la destination pour analyser et configurer le service WinRM : « winrm quickconfig »."
+            Write-Host "|  Nom d'utilisateur ou mot de passe incorrect"
+            "|  Le service WinRM n'est peut être pas configuré."
+            "|  Exécutez la commande suivante sur la destination pour analyser et configurer le service WinRM : « winrm quickconfig »."
             exit
         }
     } 
@@ -146,8 +146,8 @@ if (!([string]::IsNullOrEmpty($session))) {
     $testPath = Test-Path -Path "./logs"                                                                                        # Teste le chemin indiqué
 }
 else {
-    Write-Host "Le service WinRM n'est pas configuré."
-               "Exécutez la commande suivante sur la destination pour analyser et configurer le service WinRM : « winrm quickconfig »."
+    Write-Host "|  Le service WinRM n'est pas configuré."
+    "|  Exécutez la commande suivante sur la destination pour analyser et configurer le service WinRM : « winrm quickconfig »."
     exit
 }
 
@@ -191,10 +191,10 @@ $log =
 "`n|  " + $installedPrograms +
 "`n" 
 
-if ($testPath -eq $false){
+if ($testPath -eq $false) {
 
     New-Item -Path . -Name "logs" -ItemType "Directory" | Out-Null
-    Write-Host "`n`tDossier des logs crée." -ForegroundColor Green
+    Write-Host "|  Dossier des logs crée." -ForegroundColor Green
 } 
 
 $logTab + $log | Write-Output >> ./logs/$date-sysinfologger.log
