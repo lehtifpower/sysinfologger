@@ -136,6 +136,7 @@ if (!([string]::IsNullOrEmpty($session))) {
     $totalRAM = (Get-CimInstance -CimSession $session CIM_OperatingSystem).TotalVisibleMemorySize / 1MB                         # Quantité totale de RAM
     $usedRAM = $totalRAM - (Get-CimInstance -CimSession $session CIM_OperatingSystem).FreePhysicalMemory / 1MB                  # Quantitée de RAM utilisée
     $disks = Get-CimInstance -CimSession $session CIM_LogicalDisk                                                               # Liste de tout les disques
+    $testPath = Test-Path -Path "./logs"
 }
 else {
     Write-Host "Session is null"
@@ -181,6 +182,11 @@ $log =
 "`n├─ INSTALLED PROGRAMS :" + 
 "`n|  " + $installedPrograms +
 "`n" 
-    
+
+if ($testPath -eq $false){
+    New-Item -Path . -Name "logs" -ItemType "Directory"
+    Write-Host "Dossier des logs crée."
+} 
+
 $logTab + $log | Write-Output >> ./logs/$date-sysinfologger.log
 $log | Write-Host
