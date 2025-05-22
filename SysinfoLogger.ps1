@@ -100,6 +100,11 @@ param (
 ###################################################################################################################
 # Zone de tests comme les paramètres renseignés ou les droits administrateurs
 
+if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+  Write-Host "Vous devez exécuter ce script en tant qu'administrateur"
+  Exit
+}
+
 if (!([string]::IsNullOrEmpty($RemoteMachine))) {
     if (Test-Connection -ComputerName $RemoteMachine -Count 1 -Quiet) {
         Write-Host "$RemoteMachine is reachable"
@@ -108,6 +113,8 @@ if (!([string]::IsNullOrEmpty($RemoteMachine))) {
         }
         catch {
             Write-Host "Nom d'utilisateur ou mot de passe incorrect"
+                       "Le service WinRM n'est peut être pas configuré."
+                       "Exécutez la commande suivante sur la destination pour analyser et configurer le service WinRM : « winrm quickconfig »."
             exit
         }
     } 
@@ -117,7 +124,7 @@ if (!([string]::IsNullOrEmpty($RemoteMachine))) {
     }
 }
 else {
-    $session = New-CimSession -ComputerName $env:COMPUTERNAME
+    $session = New-CimSession -ComputerName $env:COMPUTERNAME -ErrorAction SilentlyContinue
 }
 
 ###################################################################################################################
@@ -139,7 +146,8 @@ if (!([string]::IsNullOrEmpty($session))) {
     $testPath = Test-Path -Path "./logs"                                                                                        # Teste le chemin indiqué
 }
 else {
-    Write-Host "Session is null"
+    Write-Host "Le service WinRM n'est pas configuré."
+               "Exécutez la commande suivante sur la destination pour analyser et configurer le service WinRM : « winrm quickconfig »."
     exit
 }
 
