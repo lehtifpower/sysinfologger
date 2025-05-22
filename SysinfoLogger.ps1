@@ -194,7 +194,7 @@ $log =
 
 if ($testPath -eq $false) {
     New-Item -Path . -Name "logs" -ItemType "Directory" | Out-Null
-    Write-Host "|  Dossier des logs crée." -ForegroundColor Green
+    Write-Host "`n|  Dossier des logs crée dans : $pwd\logs" -ForegroundColor Green
 } 
 
 $logTab + $log | Write-Output >> ./logs/$date-sysinfologger.log
